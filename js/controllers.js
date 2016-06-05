@@ -8,8 +8,8 @@ appControllers
         $scope.messageCount = 0;
         $scope.hideMessage = true;
         $rootScope.registered = true;
-        //var code = $stateParams.code;
-        var code = "o7aBGs2evt8W644-18cO1fcrQImI";
+        var code = $stateParams.code;
+        //var code = "o7aBGs2evt8W644-18cO1fcrQImI";
         if(undefined!=code&&(typeof $rootScope.user == 'undefined')){
             weixinFactory.getUserByCode(code);
         }
