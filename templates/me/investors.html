@@ -1,0 +1,61 @@
+<ion-view view-title="投资人管理" ng-controller="investorsController">
+    <ion-header-bar class="bar-light">
+        <h1 class="title">投资人管理</h1>
+    </ion-header-bar>
+    <ion-content>
+        <form name="investorForm">
+            <div class="weui_cells_title">选择投资人<span class="prompt-info" ng-bind="tipInfo"></span></div>
+            <div class="weui_cells weui_cells_radio">
+                <label class="weui_cell weui_check_label" ng-repeat="investor in investors">
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p ng-bind="investor.nickname" style="margin-bottom: 0px;"></p>
+                    </div>
+                    <div class="weui_cell_ft">
+                        <input type="radio" class="weui_check" ng-model="selectedInvestor.id" ng-value="investor.id" ng-click="parseUser(investor.id)">
+                        <span class="weui_icon_checked"></span>
+                    </div>
+                </label>
+            </div>
+            <div class="weui_cells_title">选择投资人的用户</div>
+            <div class="weui_cells weui_cells_checkbox">
+                <div class="button-bar" style="border: 1px;padding:5px 16px;">
+                    <button class="button button-small" ng-class="{'button-balanced':assigned==false,'button-stable':assigned}" ng-click="assignedUser('N')">未分配投资人</button>
+                    <button class="button button-small" ng-class="{'button-balanced':assigned,'button-stable':assigned==false}" ng-click="assignedUser('Y')">已分配投资人</button>
+                </div>
+                <div ng-show="assigned==false">
+                    <label class="weui_cell weui_check_label" ng-repeat="other in selectedInvestor.other">
+                        <div class="weui_cell_hd">
+                            <input type="checkbox" class="weui_check" ng-model="other.checked">
+                            <i class="weui_icon_checked"></i>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <p style="margin: 0 0;">
+                                <span ng-bind="other.nickname"></span>
+                                <span ng-show="other.phone">:</span>
+                                <span ng-bind="other.phone"></span>
+                            </p>
+                        </div>
+                    </label>
+                </div>
+                <div ng-show="assigned">
+                    <label class="weui_cell weui_check_label" ng-repeat="admin in selectedInvestor.admin">
+                        <div class="weui_cell_hd">
+                            <input type="checkbox" class="weui_check" ng-model="admin.checked">
+                            <i class="weui_icon_checked"></i>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <p style="margin: 0 0;">
+                                <span ng-bind="admin.nickname"></span>
+                                <span ng-show="admin.phone">:</span>
+                                <span ng-bind="admin.phone"></span>
+                            </p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </form>
+    </ion-content>
+    <ion-footer-bar>
+        <button class="button button-block button-balanced" style="margin: 0 0;padding: 0 0;" ng-click="updateInvestor()">更新投资人</button>
+    </ion-footer-bar>
+</ion-view>

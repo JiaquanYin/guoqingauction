@@ -1,0 +1,29 @@
+<ion-view view-title="我的宝贝详情">
+    <ion-content class="page weui_tab_bd" ng-controller="myartifactDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:10px 15%" ng-bind="artifact.name"></p>
+                <p ng-bind="artifact.introduction"></p>
+                <div class="thumbnails">
+                    <div class="thumbnail"  ng-repeat="image in artifact.images | orderBy : 'id'">
+                        <img class="full-image" ng-src="{{image.src}}">
+                    </div>
+                </div>
+                <p>
+                    <a href="#" class="subdued">类别:{{type}}</a>
+                    <a href="#" class="subdued">起拍价:{{artifact.startPrice}}</a>
+                    <a href="#" class="subdued">加价幅度:{{artifact.increase}}</a>
+                    <a href="#" class="subdued">一口价:{{artifact.heartPrice}}</a>
+                    <a href="#" class="subdued">积分拍卖:{{artifact.pointed=='1'?'是':'否'}}</a>
+                </p>
+                <p style="text-align: center;" ng-show="artifact.status=='0'">
+                    <a ng-show="artifact.pointed=='1'" ng-href="#tabs/point/{{artifact.id}}" class="subdued" style="color:#1a8dff;">查看竞拍详情</a>
+                    <a ng-show="artifact.pointed=='0'" ng-href="#tabs/artifact/{{artifact.id}}" class="subdued"  style="color:#1a8dff;">查看竞拍详情</a>
+                </p>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

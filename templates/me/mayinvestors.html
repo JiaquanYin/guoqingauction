@@ -1,0 +1,49 @@
+<ion-view view-title="设置投资人" ng-controller="mayinvestorsController">
+    <ion-header-bar class="bar-light">
+        <h1 class="title">设置投资人</h1>
+    </ion-header-bar>
+    <ion-content>
+        <div class="weui_cells weui_cells_checkbox" style="margin-top: 0px;">
+            <div class="button-bar" style="border: 1px;padding:5px 16px;">
+                <button class="button button-small" ng-class="{'button-balanced':mayinvestor,'button-stable':mayinvestor==false}" ng-click="changeType(true)">非投资人</button>
+                <button class="button button-small" ng-class="{'button-balanced':mayinvestor==false,'button-stable':mayinvestor}" ng-click="changeType(false)">投资人</button>
+            </div>
+            <div ng-show="mayinvestor">
+                <label class="weui_cell weui_check_label" ng-repeat="investor in mayinvestors" ng-show="investor.nickname||investor.phone">
+                    <div class="weui_cell_hd">
+                        <input type="checkbox" class="weui_check" ng-model="investor.checked">
+                        <i class="weui_icon_checked"></i>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p style="margin: 0 0;">
+                            <span ng-bind="investor.nickname"></span>
+                            <span ng-show="investor.phone">:</span>
+                            <span ng-bind="investor.phone"></span>
+                        </p>
+                    </div>
+                </label>
+            </div>
+            <div ng-show="mayinvestor==false">
+                <label class="weui_cell weui_check_label" ng-repeat="investor in investors" ng-show="investor.nickname||investor.phone">
+                    <div class="weui_cell_hd">
+                        <input type="checkbox" class="weui_check" ng-model="investor.checked">
+                        <i class="weui_icon_checked"></i>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary">
+                        <p style="margin: 0 0;">
+                            <span ng-bind="investor.nickname"></span>
+                            <span ng-show="investor.phone">:</span>
+                            <span ng-bind="investor.phone"></span>
+                        </p>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </ion-content>
+    <ion-footer-bar>
+        <button class="button button-block button-balanced" style="margin: 0 0;padding: 0 0;" ng-click="setInvesotrs()">
+            <span ng-show="mayinvestor">设置为投资人</span>
+            <span ng-show="mayinvestor==false">设为非投资人</span>
+        </button>
+    </ion-footer-bar>
+</ion-view>

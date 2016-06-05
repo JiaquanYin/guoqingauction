@@ -1,0 +1,56 @@
+<ion-view view-title="我的宝贝详情">
+    <ion-content class="page weui_tab_bd" ng-controller="payOrderDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list" ng-show="isLoading==false">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:10px 15%" ng-bind="order.artifact.name"></p>
+                <div class="thumbnails">
+                    <div class="thumbnail"  ng-repeat="image in order.artifact.images | orderBy : 'id'">
+                        <img class="full-image" ng-src="{{image.src}}">
+                    </div>
+                </div>
+                <p ng-bind="order.artifact.introduction"></p>
+                <p style="text-align: center;">
+                    <a href="#" class="subdued">类别:{{type}}</a>
+                    <a href="#" class="subdued">起拍价:{{order.artifact.startPrice}}</a>
+                    <a href="#" class="subdued">成交价:{{order.price}}</a>
+                </p>
+                <div class="bd">
+                    <div class="weui_cells_title" style="padding-left: 1px">卖家信息</div>
+                    <div class="weui_cells weui_cells_radio">
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">卖家昵称:{{order.artifact.user.nickname}}</div>
+                        </label>
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">卖家电话:{{order.artifact.user.phone}}</div>
+                        </label>
+                    </div>
+                </div>
+                <div class="bd">
+                    <div class="weui_cells_title" style="padding-left: 1px">选择地址{{addresses.length==0?'(添加地址)':''}}</div>
+                    <div class="weui_cells weui_cells_radio">
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px" ng-repeat="address in addresses">
+                            <div class="weui_cell_bd weui_cell_primary">
+                                <p style="vertical-align: middle;margin:5px 0;">{{address.username+'-'+address.detailInfo+'('+address.telNumber+')'}}</p>
+                            </div>
+                            <div class="weui_cell_ft" ng-click="submitAddress({{address.id}})">
+                                <input type="radio" class="weui_check" name="addressId" ng-value="address.id">
+                                <span class="weui_icon_checked"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+            <div class="item item-divider" ng-if="order.artifact.pointed==0">
+                <button ng-disabled="paying" class="button button-block button-assertive" ng-click="payMoney()">微信支付</button>
+            </div>
+            <div class="item item-divider" ng-if="order.artifact.pointed==1">
+                <button ng-disabled="paying&&order.artifact.status=='2'" class="button button-block button-assertive" ng-click="payPoint()">积分支付</button>
+            </div>
+
+        </div>
+    </ion-content>
+</ion-view>

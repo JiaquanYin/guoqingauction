@@ -1,0 +1,49 @@
+<ion-view view-title="积分拍卖" ng-controller="pointController">
+    <ion-content class="weui_tab_bd">
+        <ion-refresher
+                pulling-text="下拉刷新..."
+                on-refresh="doRefresh()">
+        </ion-refresher>
+        <div ng-if="isLoading" style="margin-top: 10px;text-align: center;">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <p ng-show="isLoading==false&&artifacts.length==0" class="no-data">还没有宝贝...</p>
+        <ion-list style="margin:0 0" ng-if="isLoading==false">
+            <div class="list" ng-repeat="artifact in artifacts" style="margin: 0 0;">
+                <div class="item item-avatar">
+                    <img ng-src="{{artifact.user.headimgurl}}">
+                    <h2><span class="level">{{artifact.user.sellerLevel.name}}</span>{{artifact.user.nickname}}</h2>
+                    <p ng-bind="artifact.user.shopInfo"></p>
+                    <a class="right-corner-time" ng-href="#/shop/{{artifact.user.id}}">进入店铺</a>
+                </div>
+
+                <div class="item item-body">
+                    <p ng-bind="artifact.introduction" style="margin-top: 0px;margin-bottom: 10px;"></p>
+                    <img class="full-image" ng-src="{{artifact.images[0].src}}">
+                    <div class="row">
+                        <a href="#" class="subdued col text-center">
+                            <img src="icons/iconfont-start.png">
+                            <span ng-if="artifact.startPrice>0" ng-bind="artifact.startPrice"></span>
+                            <span ng-if="artifact.startPrice<=0">...</span>
+                        </a>
+                        <a href="#" class="subdued col text-center">
+                            <img src="icons/iconfont-increase.png">
+                            <span ng-if="artifact.increase>0" ng-bind="artifact.increase"></span>
+                            <span ng-if="artifact.increase<=0">...</span>
+                        </a>
+                        <a href="#" class="subdued col text-center">
+                            <img src="icons/iconfont-top.png">
+                            <span ng-if="artifact.heartPrice>0" ng-bind="artifact.heartPrice"></span>
+                            <span ng-if="artifact.heartPrice<=0">...</span>
+                        </a>
+                        <a ng-href="#/tabs/point/{{artifact.id}}" class="icon-right col"  style="text-align: right">
+                            详情<i class="icon ion-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </ion-list>
+        <button ng-if="loadingMore==false&&isLoading==false&&hasNextPage()" class="button button-clear button-block" ng-click="loadMore()"><i class="icon ion-chevron-down"></i></button>
+        <button ng-if="loadingMore&&isLoading==false&&hasNextPage()" class="button button-clear button-block"><i class="icon ion-load-d"></i></button>
+    </ion-content>
+</ion-view>

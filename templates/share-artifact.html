@@ -1,0 +1,26 @@
+<ion-view view-title="宝贝详情">
+    <ion-content ng-controller="shareArtfactController">
+        <div ng-show="showloading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <p class="no-data" ng-show="nodata&&showloading==false">没有相关数据了奥</p>
+        <div ng-hide="showloading||nodata">
+            <div class="list card">
+                <div class="item item-avatar">
+                    <img ng-src="{{artifact.user.headimgurl}}">
+                    <h2 ng-bind="artifact.user.nickname"></h2>
+                    <p ng-bind="artifact.user.shopInfo"></p>
+                </div>
+                <div class="item item-body">
+                    <div class="page_title" ng-bind="artifact.name" style="padding-bottom: 10px;"></div>
+                    <img class="full-image" ng-src="{{image.src}}" ng-repeat="image in artifact.images">
+                    <p ng-bind="artifact.introduction"></p>
+                    <p style="text-align: center">
+                        <a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx40514ce44607c7c7&redirect_uri=http%3a%2f%2fguoqing999.com%2fguoqingauction%2findex.html%23%2ftabs%2fhome&response_type=code&scope=snsapi_base&state=yjq2016#wechat_redirect" class="subdued">访问国青艺拍堂</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <br>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,34 @@
+<ion-view view-title="查看地址" ng-controller="addressLookController">
+    <ion-content>
+        <div ng-show="isLoading"  class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <ion-list ng-hide="isLoading" class="list">
+            <div class="item item-divider text-center">详细地址</div>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">收货人</span>
+                <input type="text" ng-disabled="true" ng-value="address.username">
+            </label>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">手机号</span>
+                <input type="text" ng-disabled="true" ng-value="address.telNumber">
+            </label>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">省份</span>
+                <input type="text" ng-disabled="true" ng-value="address.firstStage">
+            </label>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">区/市</span>
+                <input type="text" ng-disabled="true" ng-value="address.secondStage">
+            </label>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">县</span>
+                <input type="text" ng-disabled="true" ng-value="address.thirdStage">
+            </label>
+            <label class="item item-input">
+                <span class="input-label" style="width: 25%;">详细地址</span>
+                <input type="text" ng-disabled="true" ng-value="address.detailInfo">
+            </label>
+        </ion-list>
+    </ion-content>
+</ion-view>

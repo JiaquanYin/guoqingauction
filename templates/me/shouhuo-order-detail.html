@@ -1,0 +1,31 @@
+<ion-view view-title="代发货宝贝">
+    <ion-content class="page weui_tab_bd" ng-controller="shouhuoOrderDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:10px 15%" ng-bind="order.artifact.name"></p>
+                <div class="thumbnails">
+                    <div class="thumbnail"  ng-repeat="image in order.artifact.images | orderBy : 'id'">
+                        <img class="full-image" ng-src="{{image.src}}">
+                    </div>
+                </div>
+                <p ng-bind="order.artifact.introduction"></p>
+                <p>
+                    <a href="#" class="subdued">类别:<span ng-bind="type"></span></a>
+                    <a href="#" class="subdued">起拍价:<span ng-bind="order.artifact.startPrice"></span></a>
+                    <a href="#" class="subdued">成交价:<span ng-show="order.artifact.pointed==0" ng-bind="order.price | currency:'¥'"></span><span ng-show="order.artifact.pointed==1" ng-bind="order.price | currency:'积分'"></span></a>
+                </p>
+                <p>
+                    <a href="#" class="subdued">物流单号:<span ng-bind="order.expressNumber"></span></a>
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+            <div class="item item-divider">
+                <button ng-disabled="disable" class="button button-block button-balanced" ng-click="shouhuo()">确认收货</button>
+                <button ng-disabled="disable" class="button button-block button-assertive" ng-click="tuihuo()">申请退货</button>
+            </div>
+
+        </div>
+    </ion-content>
+</ion-view>

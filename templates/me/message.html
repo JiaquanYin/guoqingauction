@@ -1,0 +1,25 @@
+<ion-view view-title="我的消息" ng-controller="myMessageController">
+    <ion-content class="weui_tab_bd">
+        <div class="page">
+            <div class="bar bar-header bar-light">
+                <h1 class="title">我的消息</h1>
+            </div>
+            <div class="list has-header">
+                <p class="no-data" ng-show="messages.length<1">没消息了奥...</p>
+                <div class="card" ng-repeat="message in messages">
+                    <div class="item item-divider">
+                        <p ng-bind="message.createTime|date:'yyyy-MM-dd HH:mm:ss'" style="text-align: center;"></p>
+                    </div>
+                    <div class="item item-text-wrap">
+                        <span ng-bind="message.message"></span>
+                        <a ng-show="message.artifactId>0&&message.type=='1'" ng-href="#/tabs/point/{{message.artifactId}}" style="color: #1598ff">查看</a>
+                        <a ng-show="message.artifactId>0&&message.type=='0'" ng-href="#/tabs/artifact/{{message.artifactId}}" style="color: #1598ff">查看</a>
+                    </div>
+                    <div class="item item-divider" style="font-size: 16px;text-align: center;">
+                        <button ng-click="read({{message}})" class="button button-small button-outline button-assertive" style="margin: 0 auto;padding: 0px 25px;">已 读</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,26 @@
+<ion-view view-title="帖子详情" ng-controller="forumDetailController">
+    <ion-content delegate-handle="mainScroll">
+        <ion-list>
+            <div class="item item-avatar" style="border-top: 0;">
+                <img ng-src="{{forum.user.headimgurl}}">
+                <h2 ng-bind="forum.user.nickname"></h2>
+                <p ng-bind="forum.user.shopInfo"></p>
+            </div>
+            <div class="item item-body" style="border-bottom: 0px;">
+                <p ng-bind="forum.content" style="margin-top: 0px;margin-bottom: 10px;"></p>
+                <img class="full-image" ng-src="{{forumImage.src}}" ng-repeat="forumImage in forum.forumImages">
+                <p style="margin: 0px;">
+                    <img ng-src="{{comment.user.headimgurl}}" ng-if="comment.support=='1'" class="circle-img-24" ng-repeat="comment in forum.forumComments">
+                </p>
+                <p style="margin: 0px;" ng-repeat="forumComment in forum.forumComments" ng-if="forumComment.comment.length>0"><span>{{forumComment.user.nickname}}:</span><span>{{forumComment.comment}}</span><br></p>
+            </div>
+        </ion-list>
+    </ion-content>
+    <ion-footer-bar class="item-input-inset">
+        <label class="item-input-wrapper" ng-click="toContentBottom()">
+            <i class="icon ion-edit placeholder-icon"></i>
+            <input type="text" placeholder="评论内容" ng-model="inputComment">
+        </label>
+        <button ng-disabled="commenting" class="button button-clear" ng-click="comment()">评论</button>
+    </ion-footer-bar>
+</ion-view>

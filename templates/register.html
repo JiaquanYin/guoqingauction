@@ -1,0 +1,62 @@
+<ion-view view-title="注册">
+    <ion-content class="weui_tab_bd page-bg" ng-controller="registerController">
+        <form name="registerForm" ng-hide="registerTip" style="background: transparent;">
+            <div style="margin-top: 30px;">
+                <h1 class="page_title">注册</h1>
+            </div>
+            <div class="weui_cells_title" style="margin-top: 0">请补充您的信息...</div>
+            <div class="weui_cells weui_cells_form" style="background: transparent;">
+                <div class="weui_cell">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label my_weui_label" style="color: #c05f28;">昵称</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary" ng-class="{ 'has-errors' : registerForm.nickname.$invalid}">
+                        <input class="weui_input" type="text" name="nickname" ng-model="user.nickname" ng-maxlength="15" required placeholder="请输入昵称">
+                    </div>
+                    <div class="error-container" style="margin:0px 0px" ng-show="registerForm.nickname.$dirty && registerForm.nickname.$error" ng-messages="registerForm.nickname.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+                </div>
+
+                <div class="weui_cell">
+                    <div class="weui_cell_hd">
+                        <label class="weui_label my_weui_label" style="color: #c05f28;">手机号码</label>
+                    </div>
+                    <div class="weui_cell_bd weui_cell_primary" ng-class="{'has-errors' : registerForm.phone.$invalid}">
+                        <input class="weui_input" type="text" name="phone" ng-model="user.phone" required ng-pattern="/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/" placeholder="请输入手机号码"/>
+                    </div>
+                    <div class="error-container" style="margin:0px 0px" ng-show="registerForm.phone.$dirty && registerForm.phone.$error" ng-messages="registerForm.phone.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+                </div>
+
+                <div class="weui_cell">
+                    <div class="weui_cell_bd weui_cell_primary" ng-class="{ 'has-errors' : registerForm.shopInfo.$invalid}">
+                        <textarea class="weui_textarea" name="shopInfo" ng-model="user.shopInfo" ng-maxlength="200" placeholder="请输入店铺介绍" rows="4" style="text-indent: 0px;background: transparent;"></textarea>
+                    </div>
+                </div>
+
+                <div class="error-container" style="margin:0px 0px" ng-show="registerForm.shopInfo.$dirty && registerForm.shopInfo.$error" ng-messages="registerForm.shopInfo.$error">
+                    <div ng-messages-include="templates/error-list.html"></div>
+                </div>
+            </div>
+
+            <div class="weui_cells space-bottom" style="margin-top:0;background: transparent;">
+                <div class="weui_cells_tips" ng-show="0<tipInfo.length">
+                    <p class="padding" style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+                </div>
+                <div class="weui_btn_area" style="margin-top:10px;">
+                    <button ng-disabled="registerForm.$invalid||submiting" class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" ng-click="register()">提交信息</button>
+                </div>
+            </div>
+
+        </form>
+        <div ng-show="registerTip" class="padding">
+            <h4 style="text-align: center;">快速玩转艺拍堂</h4>
+            <h5>卖家</h5>
+            <p>参与“论坛”（发帖、点赞、评论）或点击“我要代言”赚积分，积分可用于升级（升级规则详见关于艺拍堂），一定级别可发布宝贝至卖场。</p>
+            <h5>买家</h5>
+            <p>点击“看看宝贝”竞拍或参与“论坛”（赚积分）或“积分拍卖”（用积分竞拍）或点击“我要代言”（邀请好友赚积分，成功交易有返利）。详见关于艺拍堂。</p>
+        </div>
+    </ion-content>
+</ion-view>

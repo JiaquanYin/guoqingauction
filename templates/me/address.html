@@ -1,0 +1,39 @@
+<ion-view view-title="我的地址" ng-controller="addressController">
+    <ion-content>
+        <ion-refresher
+                pulling-text="下拉刷新..."
+                on-refresh="doRefresh()">
+        </ion-refresher>
+        <div ng-show="isLoading"  class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <ion-list>
+            <ion-item ng-repeat="address in addresses">
+                <a ng-href="#/address-look/{{address.id}}">
+                    <h2>{{address.username}}<span class="padding-left">{{address.telNumber}}</span></h2>
+                    <p>
+                        <span ng-bind="address.firstStage"></span>
+                        <span ng-bind="address.secondStage"></span>
+                        <span ng-bind="address.thirdStage"></span>
+                        <span ng-bind="address.detailInfo"></span>
+                    </p>
+                </a>
+                <ion-option-button class="button-balanced" ng-click="editAddress({{address}})">
+                    修改地址
+                </ion-option-button>
+                <ion-option-button class="button-assertive" ng-click="deleteAddress({{address}})">
+                    删除地址
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+        <div class="padding">
+            <a class="button button-block button-balanced" href="#/address-new">新增地址</a>
+        </div>
+        <ion-infinite-scroll
+                distance="1%"
+                ng-if="hasNextPage()"
+                icon="ion-loading-c"
+                on-infinite="loadMore()">
+        </ion-infinite-scroll>
+    </ion-content>
+</ion-view>

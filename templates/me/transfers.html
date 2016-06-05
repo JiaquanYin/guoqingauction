@@ -1,0 +1,21 @@
+<ion-view view-title="提现">
+    <ion-content ng-controller="transfersController">
+        <form name="moneyForm" novalidate="novalidate">
+            <div class="bar bar-header item-input-inset" style="margin-top: 20px">
+                <label class="item-input-wrapper">
+                    <i class="icon ion-social-yen-outline placeholder-icon"></i>
+                    <input type="number" name="transferMoney" ng-model="transferMoney">
+                </label>
+                <button ng-disabled="submiting||moneyForm.$invalid" class="button button-small button-balanced" ng-click="transfer()">
+                    提取现金
+                </button>
+            </div>
+            <div class="error-container" style="margin:10px 10px;" ng-show="moneyForm.transferMoney.$dirty && moneyForm.transferMoney.$error" ng-messages="moneyForm.transferMoney.$error">
+                <div ng-messages-include="templates/error-list.html"></div>
+            </div>
+            <div style="padding: 15px 10px;" ng-show="0<tipInfo.length">
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

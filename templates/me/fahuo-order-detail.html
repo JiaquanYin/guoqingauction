@@ -1,0 +1,41 @@
+<ion-view view-title="待发货宝贝">
+    <ion-content class="page weui_tab_bd" ng-controller="fahuoOrderDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list" ng-show="isLoading==false" style="margin-bottom: 50px;">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:0px 15%" ng-bind="order.artifact.name"></p>
+                <div class="row" ng-repeat="group in groupImages" style="padding: 0px;"> 
+                    <div class="col" ng-repeat="image in group" style="padding: 0px  1px;;"> 
+                        <img class="full-image" ng-src="{{image.src}}"/> 
+                    </div> 
+                </div>
+                <p ng-bind="order.artifact.introduction"></p>
+                <p>
+                    <a href="#" class="subdued">类别:{{type}}</a>
+                    <a href="#" class="subdued">起拍价:{{order.artifact.startPrice}}</a>
+                    <a href="#" class="subdued">成交价:{{order.price}}</a>
+                </p>
+                <p>
+                    <span style="color:#51ff33">发货地址:</span>
+                    <span ng-bind="order.address.firstStage"></span>
+                    <span ng-bind="order.address.secondStage"></span>
+                    <span ng-bind="order.address.thirdStage"></span>
+                    <span ng-bind="order.address.detailInfo"></span>
+                    <br>
+                    <span style="color:#51ff33">收货人:</span><span ng-bind="order.address.username"></span><br>
+                    <span style="color:#51ff33">电话:</span><span ng-bind="order.address.telNumber"></span>
+                </p>
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+            <div class="item item-input-inset" ng-show="fahuoStatus">
+                <label class="item-input-wrapper">
+                    <input type="text" placeholder="快递单号" ng-model="order.expressNumber">
+                </label>
+                <button ng-disabled="fahuoing" class="button button-small assertive" ng-click="fahuo()">确认发货</button>
+            </div>
+
+        </div>
+    </ion-content>
+</ion-view>

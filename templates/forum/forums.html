@@ -1,0 +1,47 @@
+<ion-view view-title="帖子" ng-controller="forumsController">
+    <a href="#/forum/deploy" class="top_right_corner">
+        <img src="icons/forum-create.png">
+    </a>
+    <ion-content>
+        <ion-refresher pulling-text="下拉刷新..." on-refresh="doRefresh()"></ion-refresher>
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <p ng-show="isLoading==false&&forums.length==0" class="no-data">还没有帖子...</p>
+        <ion-list ng-repeat="forum in forums" ng-show="isLoading==false">
+            <div class="item item-avatar" style="border-top: 0;">
+                <img ng-src="{{forum.user.headimgurl}}">
+                <h2 ng-bind="forum.user.nickname"></h2>
+                <p ng-bind="forum.user.shopInfo"></p>
+                <a class="right-corner-time" ng-href="#/shop/{{forum.user.id}}">进入店铺</a>
+            </div>
+            <div class="item item-body">
+                <p ng-bind="forum.content" style="margin-top: 0px;margin-bottom: 10px;"></p>
+                <img class="full-image" ng-src="{{forum.forumImages[0].src}}">
+                <p style="margin: 0px;">
+                    <img ng-src="{{comment.user.headimgurl}}" ng-if="comment.support=='1'" class="circle-img-24" ng-repeat="comment in forum.forumComments">
+                </p>
+                <p style="margin: 0px;" ng-repeat="forumComment in forum.forumComments" ng-if="forumComment.comment.length>0"><span>{{forumComment.user.nickname}}:</span><span>{{forumComment.comment}}</span><br></p>
+                <div class="row row-center" style="padding: 0 2px;">
+                    <div class="col col-center" style="padding: 0 0;text-align: center">
+                        <button href="javascript:;" ng-disabled="supporting||forum.supported>0" ng-click="support({{forum.id}})" class="button button-small button-clear" style="font-size: 16px;">
+                            <i class="icon ion-thumbsup" style="padding-right: 10px;"></i>
+                            {{forum.supported>0?'已赞':'赞'}}
+                        </button>
+                    </div>
+                    <div class="col col-center" style="font-size: 16px;padding: 0 0;text-align: center">
+                        <a ng-href="#/forums/{{forum.id}}" class="subdued" style="font-size: 16px;"><i class="icon ion-ios-chatbubble" style="padding-right: 10px;"></i>评论</a>
+                    </div>
+                    <div class="col col-center" style="font-size: 16px;padding: 0 0;text-align: center" ng-if="user.isAdministrator=='aministrator'">
+                        <button href="javascript:;" class="button button-small button-clear" style="font-size: 16px;" ng-disabled="deleteing" ng-click="deleteForum({{forum}})"><i class="icon ion-ios-trash-outline" style="padding-right: 10px;"></i>删贴</button>
+                    </div>
+                    <a ng-href="#/forums/{{forum.id}}" class="icon-right col"  style="text-align: right">
+                        详情<i class="icon ion-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+        </ion-list>
+        <button ng-if="loadingMore==false&&isLoading==false&&hasNextPage()" class="button button-clear button-block" ng-click="loadMore()"><i class="icon ion-chevron-down"></i></button>
+        <button ng-if="loadingMore&&isLoading==false&&hasNextPage()" class="button button-clear button-block"><i class="icon ion-load-d"></i></button>
+    </ion-content>
+</ion-view>

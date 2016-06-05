@@ -1,0 +1,30 @@
+<ion-view view-title="待支付宝贝" ng-controller="payOrdersController">
+    <ion-content>
+        <ion-refresher
+                pulling-text="下拉刷新..."
+                on-refresh="doRefresh()">
+        </ion-refresher>
+        <div ng-show="isLoading"  class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <p ng-show="isLoading==false&&orders.length==0" class="no-data">还没有待支付宝贝...</p>
+        <ion-list style="margin:0 0" ng-show="isLoading==false">
+            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="order in orders">
+                <img ng-src="{{order.artifact.images[0].src}}">
+                <h2 ng-bind="order.artifact.name"></h2>
+                <p ng-if="order.artifact.pointed==0">
+                    <span style="color:#3cc51f;padding-right: 5px">需支付</span>
+                    <span class="assertive">{{order.price | currency:"¥"}}</span>
+                </p>
+                <p ng-if="order.artifact.pointed!=0">
+                    <span style="color:#3cc51f;padding-right: 5px">需支付</span>
+                    <span class="assertive">{{order.price | currency:"积分"}}</span>
+                </p>
+                <p>{{order.artifact.introduction}}</p>
+                <a href="#/pay_orders/{{order.id}}"><i class="icon ion-ios-arrow-right" style="width: 20px"></i></a>
+            </ion-item>
+        </ion-list>
+        <button ng-if="loadingMore==false&&isLoading==false&&hasNextPage()" class="button button-clear button-block" ng-click="loadMore()"><i class="icon ion-chevron-down"></i></button>
+        <button ng-if="loadingMore&&isLoading==false&&hasNextPage()" class="button button-clear button-block"><i class="icon ion-load-d"></i></button>
+    </ion-content>
+</ion-view>

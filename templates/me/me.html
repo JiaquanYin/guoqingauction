@@ -1,0 +1,118 @@
+<ion-view view-title="我的艺拍堂" ng-controller="meController">
+    <ion-content>
+        <div class="page">
+            <div class="weui_msg" style="padding-top: 12px">
+                <div class="weui_icon_area" style="margin-bottom: 10px">
+                    <img class="page_top_icon" ng-src="{{user.headimgurl}}" style="border-radius:50%;">
+                </div>
+                <div class="weui_text_area" style="margin-bottom: 15px">
+                    <h2 class="weui_msg_title" ng-bind="user.nickname" style="color:#3cc51f;"></h2>
+                    <p class="weui_msg_desc">
+                        <span style="margin-right: 10px">买家级别></span><span ng-bind="user.buyerLevel.name"></span>
+                        <span style="margin-right: 10px">卖家级别></span><span ng-bind="user.sellerLevel.name"></span>
+                        <span style="margin-right: 10px">积分></span><span ng-bind="user.point"></span>
+                    </p>
+                </div>
+                <div class="weui_grids">
+                    <a href="#/myartifacts" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-baobei.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            我的宝贝
+                        </p>
+                    </a>
+                    <a href="#/pay_orders" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-pay.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            待支付
+                        </p>
+                    </a>
+                    <a href="#/fahuo_orders" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-fahuo.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            待发货
+                        </p>
+                    </a>
+                    <a href="#/shouhuo_orders" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-daishouhuo.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            待收货
+                        </p>
+                    </a>
+                    <a href="#/evaluation_orders" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-pingjia.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            待评价
+                        </p>
+                    </a>
+                    <a href="#/address" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-address.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            我的地址
+                        </p>
+                    </a>
+                    <a href="#/wallet" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-money.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            我的钱包
+                        </p>
+                    </a>
+                    <a href="#/store" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <img src="icons/iconfont-shoucang.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            我的收藏
+                        </p>
+                    </a>
+                    <a href="#/messages" class="weui_grid js_grid">
+                        <div class="weui_grid_icon">
+                            <div class="my_badge" ng-show="messageCount>0" ng-bind="messageCount"></div>
+                            <img src="icons/iconfont-message.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            我的消息
+                        </p>
+                    </a>
+                    <a href="#/mayinvestors" class="weui_grid js_grid" ng-if="user.isAdministrator=='aministrator'">
+                        <div class="weui_grid_icon">
+                            <img src="icons/tzsz.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            设置投资人
+                        </p>
+                    </a>
+                    <a href="#/investors" class="weui_grid js_grid" ng-if="user.isAdministrator=='aministrator'">
+                        <div class="weui_grid_icon">
+                            <img src="icons/investors.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            投资人管理
+                        </p>
+                    </a>
+                    <a href="#/shenpi" class="weui_grid js_grid" ng-if="user.isAdministrator=='aministrator'">
+                        <div class="weui_grid_icon">
+                            <img src="icons/shenpi.png">
+                        </div>
+                        <p class="weui_grid_label">
+                            退货审批
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

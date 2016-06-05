@@ -1,0 +1,16 @@
+<ion-view view-title="我的收藏" ng-controller="myStoreController">
+    <ion-content>
+        <div class="page">
+            <div class="bar bar-header bar-light">
+                <h1 class="title">我的收藏</h1>
+            </div>
+            <div class="list has-header">
+                <a class="item item-avatar" ng-href="{{weburl}}#/tabs/artifact/{{store.artifactId}}" ng-repeat="store in stores">
+                    <img ng-src="{{store.artifactImg}}">
+                    <h2 ng-bind="store.artifactName"></h2>
+                    <p>{{store.storeTime|date:'yyyy-MM-dd HH:mm:ss'}}收藏</p>
+                </a>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

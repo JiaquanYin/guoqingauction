@@ -1,0 +1,29 @@
+<style>
+    .tabs-stable .tabs {
+        background-color: #f0e9cf;
+        opacity: 0.8;
+    }
+</style>
+<ion-view>
+    <ion-tabs class="tabs-icon-top tabs-stable">
+        <ion-tab title="首页" icon="ion-android-menu" href="#/tabs/home">
+            <ion-nav-view name="tab-home"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="发布" icon="ion-camera" href="#/tabs/deploy">
+            <ion-nav-view name="tab-deploy"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="看看" icon="ion-eye" href="#/tabs/artifacts">
+            <ion-nav-view name="tab-look"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="论坛" icon="ion-document-text" href="#/tabs/forums">
+            <ion-nav-view name="tab-forums"></ion-nav-view>
+        </ion-tab>
+
+        <ion-tab title="我的" icon="ion-ios-person" href="#/tabs/me" badge="data.badgeCount"  badge-style="badge-assertive">
+            <ion-nav-view name="tab-me"></ion-nav-view>
+        </ion-tab>
+    </ion-tabs>
+</ion-view>

@@ -1,0 +1,33 @@
+<ion-view view-title="我的钱包" ng-controller="walletController">
+    <ion-content>
+        <ion-refresher
+                pulling-text="下拉刷新..."
+                on-refresh="doRefresh()">
+        </ion-refresher>
+        <div class="page">
+            <div class="weui_msg" style="padding-top: 24px;">
+                <div class="weui_icon_area" style="margin-bottom: 20px;"><img src="icons/iconfont-walet.png"></div>
+                <div class="weui_text_area" style="padding-left: 5px;padding-right: 5px;">
+                    <h2 class="weui_msg_title">余额 {{user.money | currency:'¥'}}</h2>
+                    <div class="weui_msg_desc">
+                        <div class="row" style="border-bottom: thin dashed;padding:0 0">
+                            <div class="col" style="text-align: center;">序号</div>
+                            <div class="col col-33" style="text-align: center;">时间</div>
+                            <div class="col col-33" style="text-align: center;">描述</div>
+                            <div class="col" style="text-align: center;">金额</div>
+                        </div>
+                        <div class="row" style="border-bottom: thin dashed;padding:0 0" ng-repeat="(key,money) in moneys |orderBy:'-submitTime'">
+                            <div class="col" style="text-align: center;">{{key+1}}</div>
+                            <div class="col col-33" style="text-align: left;">{{money.submitTime|date:'yy-MM-dd HH:mm'}}</div>
+                            <div class="col col-33" style="text-align: left;">{{money.description}}</div>
+                            <div class="col" style="text-align: right;">{{money.money|number:2}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ion-content>
+    <ion-footer-bar>
+        <a class="button button-clear" href="#/wallet/transfers" style="margin: auto"><img src="icons/iconfont-tixian.png"></a>
+    </ion-footer-bar>
+</ion-view>

@@ -1,0 +1,31 @@
+<ion-view view-title="我的宝贝" ng-controller="myartifactController">
+    <ion-content>
+        <ion-refresher
+                pulling-text="下拉刷新..."
+                on-refresh="doRefresh()">
+        </ion-refresher>
+        <div ng-show="isLoading"  class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <p ng-show="isLoading==false&&myartifacts.length==0" class="no-data">还没有宝贝...</p>
+        <ion-list style="margin:0 0" ng-show="isLoading==false">
+            <ion-item class="item-thumbnail-left item-icon-right" ng-repeat="artifact in myartifacts">
+                <img ng-src="{{artifact.images[0].src}}">
+                <h2 ng-bind="artifact.name"></h2>
+                <p style="width: 100%">
+                    <span ng-show="artifact.status==0" style="color:#3cc51f;padding-right: 10px">拍卖中</span>
+                    <span ng-show="artifact.status==1" style="color:#3cc51f;padding-right: 10px">待支付</span>
+                    <span ng-show="artifact.status==2" style="color:#3cc51f;padding-right: 10px">待发货</span>
+                    <span ng-show="artifact.status==3" style="color:#3cc51f;padding-right: 10px">待收货</span>
+                    <span ng-show="artifact.status==4" style="color:#3cc51f;padding-right: 10px">待评价</span>
+                    <span ng-show="artifact.status==5" style="color:#3cc51f;padding-right: 10px">完成交易</span>
+                    <span ng-show="artifact.status==6" style="color:#3cc51f;padding-right: 10px">流拍</span>
+                </p>
+                <p>{{artifact.introduction}}</p>
+                <a href="#/myartifacts/{{artifact.id}}"><i class="icon ion-ios-arrow-right" style="width: 10px"></i></a>
+            </ion-item>
+        </ion-list>
+        <button ng-if="loadingMore==false&&isLoading==false&&hasNextPage()" class="button button-clear button-block" ng-click="loadMore()"><i class="icon ion-chevron-down"></i></button>
+        <button ng-if="loadingMore&&isLoading==false&&hasNextPage()" class="button button-clear button-block"><i class="icon ion-load-d"></i></button>
+    </ion-content>
+</ion-view>

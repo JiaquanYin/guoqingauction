@@ -1,0 +1,31 @@
+<ion-view view-title="代发货宝贝">
+    <ion-content class="page weui_tab_bd" ng-controller="evaluationDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:10px 15%" ng-bind="order.artifact.name"></p>
+                <div class="thumbnails">
+                    <div class="thumbnail"  ng-repeat="image in order.artifact.images | orderBy : 'id'">
+                        <img class="full-image" ng-src="{{image.src}}">
+                    </div>
+                </div>
+                <p ng-bind="order.artifact.introduction"></p>
+                <p>
+                    <a href="#" class="subdued">类别:{{type}}</a>
+                    <a href="#" class="subdued">起拍价:{{order.artifact.startPrice}}</a>
+                    <a href="#" class="subdued">成交价:<span ng-show="order.artifact.pointed==0" ng-bind="order.price | currency:'¥'"></span><span ng-show="order.artifact.pointed==1" ng-bind="order.price | currency:'积分'"></span></a>
+                </p>
+                <label class="stable-border">
+                    <textarea placeholder="您的评价" maxlength="200" rows="4" ng-model="order.artifact.evaluation" style="border:1px solid;width: 100%"></textarea>
+                </label>
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+            <div class="item item-divider">
+                <button ng-disabled="disable" class="button button-block button-balanced" ng-click="evaluation()">提交评价</button>
+            </div>
+
+        </div>
+    </ion-content>
+</ion-view>

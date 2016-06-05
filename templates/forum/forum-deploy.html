@@ -1,0 +1,59 @@
+<ion-view view-title="创建帖子">
+    <ion-content class="weui_tab_bd" ng-controller="forumDeployController">
+        <form name="forumForm" novalidate="novalidate" class="page">
+            <div class="hd">
+                <h1 class="page_title">欢迎发帖</h1>
+            </div>
+            <div class="bd">
+                <div class="weui_cells weui_cells_form" style="margin-top: 0px;">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{ 'has-errors' : forumForm.content.$invalid}">
+                            <textarea class="weui_textarea" name="content" ng-model="forum.content" ng-maxlength="200"  required placeholder="请输入帖子描述" rows="5" style="text-indent: 0px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="error-container" ng-show="forumForm.content.$dirty && forumForm.content.$error" ng-messages="forumForm.content.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+                </div>
+                <p class="weui_cells weui_cells_form" style="margin-top: 0px;">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <div class="weui_uploader">
+                                <div class="weui_uploader_hd weui_cell">
+                                    <div class="weui_cell_bd weui_cell_primary">选择图片</div>
+                                </div>
+                                <div class="weui_uploader_bd">
+                                    <ul class="weui_uploader_files">
+                                        <li class="weui_uploader_file weui_uploader_status" style="background-image:url({{localId}})" ng-repeat="localId in images.localIds" ng-click="deleteImg(localId)">
+                                            <div class="weui_uploader_status_content">
+                                                <img src="icons/iconfont-close.png">
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="weui_uploader_input_wrp">
+                                        <button class="weui_uploader_input" ng-click="chooseImage()"></button>
+                                    </div>
+                                    <div class="my_weui_upload">
+                                        <button class="weui_uploader_input" ng-click="uploadImage()"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="padding-bottom: 10px;text-align: center;">请将选择的图片上传<span class="prompt-info">({{uploaded}})</span></p>
+                </div>
+
+                <div class="weui_cells weui_cells_form space-bottom" style="margin-top: 0px;">
+                    <div class="weui_cells_tips" style="margin: 10px 0px 0px 0px;">
+                        <div style="text-align: center;color: #3cc51f;font-size: 15px;" ng-show="tipInfo.length>0">{{tipInfo}}</div>
+                    </div>
+                    <div class="weui_btn_area" style="margin: 0px 10px;">
+                        <button ng-click="deploy()" class="button button-block button-assertive" ng-disabled="forumForm.$invalid||submiting">发布帖子</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

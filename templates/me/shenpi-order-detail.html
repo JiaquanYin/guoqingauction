@@ -1,0 +1,58 @@
+<ion-view view-title="审批详情页">
+    <ion-content class="page weui_tab_bd" ng-controller="shenpiDetailController">
+        <div ng-if="isLoading" class="not-found-spiner">
+            <ion-spinner icon="spiral"></ion-spinner>
+        </div>
+        <div class="list">
+            <div class="item item-body">
+                <p style="text-align:center;font-size:24px;color:#3cc51f;font-weight:400;margin:10px 15%" ng-bind="order.artifact.name"></p>
+                <div class="thumbnails">
+                    <div class="thumbnail"  ng-repeat="image in order.artifact.images | orderBy : 'id'">
+                        <img class="full-image" ng-src="{{image.src}}">
+                    </div>
+                </div>
+                <p ng-bind="order.artifact.introduction"></p>
+                <p>
+                    <a href="#" class="subdued">类别:{{type}}</a>
+                    <a href="#" class="subdued">起拍价:{{order.artifact.startPrice}}</a>
+                    <a href="#" class="subdued">成交价:<span ng-show="order.artifact.pointed==0" ng-bind="order.price | currency:'¥'"></span><span ng-show="order.artifact.pointed==1" ng-bind="order.price | currency:'积分'"></span></a>
+                </p>
+                <div class="bd">
+                    <div class="weui_cells_title" style="padding-left: 1px">卖家信息</div>
+                    <div class="weui_cells weui_cells_radio">
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">卖家昵称:{{order.artifact.user.nickname}}</div>
+                        </label>
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">卖家电话:{{order.artifact.user.phone}}</div>
+                        </label>
+                    </div>
+                </div>
+                <div class="bd">
+                    <div class="weui_cells_title" style="padding-left: 1px">买家信息</div>
+                    <div class="weui_cells weui_cells_radio">
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">买家昵称:{{order.user.nickname}}</div>
+                        </label>
+                        <label class="weui_cell weui_check_label" style="padding:2px 15px">
+                            <div class="weui_cell_bd weui_cell_primary">买家电话:{{order.user.phone}}</div>
+                        </label>
+                    </div>
+                </div>
+                <p>退货原因:{{order.returnReason}}</p>
+                <p>订单号:{{order.expressNumber}}</p>
+                <ion-checkbox ng-model="tuikuan" ng-checked="tuikuan">同意退货,退款给买家</ion-checkbox>
+                <div style="margin-top: 10px;">
+                    <label class="stable-border">
+                        <textarea placeholder="处理意见" maxlength="200" rows="4" ng-model="order.artifact.processExplain" style="border:1px solid;width: 100%;text-indent: 0px;"></textarea>
+                    </label>
+                </div>
+                <p style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
+            </div>
+            <div class="item item-divider">
+                <button ng-disabled="disable" class="button button-block button-balanced" ng-click="shenpi()">确认审批</button>
+            </div>
+
+        </div>
+    </ion-content>
+</ion-view>

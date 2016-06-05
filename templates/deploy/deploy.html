@@ -1,0 +1,155 @@
+<ion-view view-title="发布宝贝">
+    <ion-content class="weui_tab_bd" ng-controller="deployController">
+        <p style="margin-top: 10px;padding:10px;text-align: center;" ng-hide="canShowDeploy">抱歉,发布宝贝需要达到一定等级,详细升级规则请查阅卖家指南</p>
+        <form name="deployForm" novalidate="novalidate" class="page" ng-show="canShowDeploy">
+            <div class="hd">
+                <h1 class="page_title">欢迎分享</h1>
+            </div>
+            <div class="bd">
+                <div class="weui_cells_title" style="margin-top: 0px;">请先选择图片,然后上传</div>
+                <div class="weui_cells weui_cells_form">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <div class="weui_uploader">
+                                <div class="weui_uploader_hd weui_cell">
+                                    <div class="weui_cell_bd weui_cell_primary">选择图片</div>
+                                </div>
+                                <div class="weui_uploader_bd">
+                                    <ul class="weui_uploader_files">
+                                        <li class="weui_uploader_file weui_uploader_status" style="background-image:url({{localId}})" ng-repeat="localId in images.localIds" ng-click="deleteImg(localId)">
+                                            <div class="weui_uploader_status_content">
+                                                <img src="icons/iconfont-close.png">
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="weui_uploader_input_wrp">
+                                        <button class="weui_uploader_input" ng-click="chooseImage()"></button>
+                                    </div>
+                                    <div class="my_weui_upload">
+                                        <button class="weui_uploader_input" ng-click="uploadImage()"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style="padding-bottom: 10px;text-align: center;">请将选择的图片上传<span class="prompt-info">({{uploaded}})</span></p>
+                </div>
+
+                <div class="weui_cells_title">宝贝描述信息</div>
+                <div class="weui_cells weui_cells_form">
+                    <div class="weui_cell">
+                        <div class="weui_cell_hd">
+                            <label class="weui_label my_weui_label">宝贝名称</label>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{ 'has-errors' : deployForm.name.$invalid}">
+                            <input class="weui_input" type="text" name="name" ng-model="artifact.name" ng-maxlength="20" required placeholder="输入宝贝名称">
+                        </div>
+                        <div class="error-container" style="margin:0px 0px" ng-show="deployForm.name.$dirty && deployForm.name.$error" ng-messages="deployForm.name.$error">
+                            <div ng-messages-include="templates/error-list.html"></div>
+                        </div>
+                    </div>
+
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{ 'has-errors' : deployForm.introduction.$invalid}">
+                            <textarea class="weui_textarea" name="introduction" ng-model="artifact.introduction" ng-maxlength="200"  required placeholder="输入宝贝介绍" rows="5" style="text-indent: 0px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="error-container" ng-show="deployForm.introduction.$dirty && deployForm.introduction.$error" ng-messages="deployForm.introduction.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+                </div>
+
+                <div class="weui_cells_title">宝贝类别信息</div>
+                <div class="weui_cells weui_cells_form">
+                    <div class="weui_cell weui_cell_select weui_select_after">
+                        <div class="weui_cell_hd">宝贝类别</div>
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <select class="weui_select" name="type" ng-model="artifact.type" ng-value="artifact.type">
+                                <option ng-value="type.typeKey" ng-repeat="type in types">{{type.typeValue}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui_cells_title">设置次数内,分享一次将扣除10积分</div>
+                <div class="weui_cells weui_cells_form">
+                    <div class="weui_cell">
+                        <div class="weui_cell_hd">
+                            <label class="weui_label my_weui_label">分享次数</label>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{'has-errors' : deployForm.shareNum.$dirty && deployForm.shareNum.$invalid}">
+                            <input class="weui_input" type="number" name="shareNum" ng-model="artifact.shareNum">
+                        </div>
+                        <div class="error-container" style="margin: 0 0" ng-show="deployForm.shareNum.$dirty && deployForm.shareNum.$error" ng-messages="deployForm.shareNum.$error">
+                            <div ng-messages-include="templates/error-list.html"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui_cells_title">宝贝竞拍信息</div>
+                <div class="weui_cells weui_cells_form">
+                    <div class="weui_cell">
+                        <div class="weui_cell_hd">
+                            <label class="weui_label my_weui_label">起拍价</label>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{'has-errors' : deployForm.startPrice.$dirty && deployForm.startPrice.$invalid}">
+                            <input class="weui_input" type="number" name="startPrice" ng-model="artifact.startPrice">
+                        </div>
+                    </div>
+                    <div class="error-container" ng-show="deployForm.startPrice.$dirty && deployForm.startPrice.$error" ng-messages="deployForm.startPrice.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+
+                    <div class="weui_cell">
+                        <div class="weui_cell_hd">
+                            <label class="weui_label my_weui_label">加价幅度</label>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{'has-errors' : deployForm.increase.$dirty && deployForm.increase.$invalid}">
+                            <input class="weui_input" type="number" name="increase" ng-model="artifact.increase">
+                        </div>
+                    </div>
+                    <div class="error-container" ng-show="deployForm.increase.$dirty && deployForm.increase.$error" ng-messages="deployForm.increase.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+
+                    <div class="weui_cell">
+                        <div class="weui_cell_hd">
+                            <label class="weui_label my_weui_label">一口价</label>
+                        </div>
+                        <div class="weui_cell_bd weui_cell_primary" ng-class="{'has-errors' : deployForm.heartPrice.$dirty && deployForm.heartPrice.$invalid}">
+                            <input class="weui_input" type="number" name="heartPrice" ng-model="artifact.heartPrice">
+                        </div>
+                    </div>
+                    <div class="error-container" ng-show="deployForm.heartPrice.$dirty && deployForm.heartPrice.$error" ng-messages="deployForm.heartPrice.$error">
+                        <div ng-messages-include="templates/error-list.html"></div>
+                    </div>
+
+                    <div class="weui_cells_title">是否积分拍卖?</div>
+                    <div class="weui_cells weui_cells_form">
+                        <div class="weui_cell weui_cell_switch">
+                            <div class="weui_cell_hd weui_cell_primary">积分拍卖</div>
+                            <div class="weui_cell_ft">
+                                <input class="weui_switch" type="checkbox" ng-model="pointed"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="weui_cells_title">发布提示信息</div>
+                <div class="weui_cells weui_cells_form space-bottom">
+                    <div class="weui_cells_tips">
+                        <span class="prompt-info">1. 宝贝预计在 {{artifact.deadline | date:'yyyy-MM-dd HH:mm:ss'}} 竞拍结束</span>
+                        <br>
+                        <span class="prompt-info">2. 发布的宝贝需要包邮,支持发货后7天内无理由退货</span>
+                        <div class="prompt-info" style="text-align: center;color: #3cc51f;font-size: 15px;" ng-show="tipInfo.length>0">{{tipInfo}}</div>
+                    </div>
+                    <div class="weui_btn_area" style="margin-top: 0px;">
+                        <button ng-click="deploy()" class="button button-block button-assertive" ng-disabled="deployForm.$invalid||submiting">发布宝贝</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </ion-content>
+</ion-view>
