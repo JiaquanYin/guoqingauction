@@ -1,15 +1,13 @@
-<ion-view view-title="首页" class="page-bg">
-    <ion-content class="my-padding weui_tab_bd"  ng-controller="homeController">
-        <div class="button_sp_area" style="margin: 26px 30px;">
-            <div ng-hide="hideMessage" style="margin: 16px auto;text-align: center;">
-                <a ng-href="#/messages" class="messages">您有{{messageCount}}条消息未读</a>
-            </div>
-            <a ng-hide="registered" class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/register">我要注册</a>
-            <a class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/tabs/deploy">发布宝贝</a>
-            <a class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/tabs/artifacts">看看宝贝</a>
-            <a class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/tabs/points">积分拍卖</a>
-            <a class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/spokesman">我要代言</a>
-            <a class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" href="#/introduction">关于艺拍堂</a>
+<ion-view view-title="首页" class="home">
+    <ion-content  ng-controller="homeController">
+        <div style="margin: 50px 30px;">
+            <p style="margin-bottom: 10px;">正在修改系统,给您带来不便请谅解</p>
+            <button class="button button-block" ng-click="register()">我的信息</button>
+            <a class="button button-block" href="#/tabs/deploy">发布宝贝</a>
+            <a class="button button-block" href="#/tabs/artifacts">看看宝贝</a>
+            <a class="button button-block" href="#/tabs/points">积分拍卖</a>
+            <a class="button button-block" href="#/spokesman">我要代言</a>
+            <a class="button button-block" href="#/introduction">关于艺拍堂</a>
         </div>
     </ion-content>
 </ion-view>

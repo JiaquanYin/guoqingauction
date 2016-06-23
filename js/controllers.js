@@ -1,88 +1,87 @@
 /**
  * Created by jiaquan on 15/12/14.
  */
-var num = 1;
 var appControllers = angular.module("myControllers",[]);
 appControllers
-    .controller('homeController',['$scope','$rootScope','$stateParams','weixinFactory','userFactory','$state','wxconfigerFactory','ENV','messageCountFactory','utilsService', function($scope,$rootScope,$stateParams,weixinFactory,userFactory,$state,wxconfigerFactory,ENV,messageCountFactory,utilsService){
-        $scope.messageCount = 0;
-        $scope.hideMessage = true;
-        $rootScope.registered = true;
+    .controller('homeController',['$scope','$rootScope','$stateParams','$state','wxconfigerFactory','ENV','utilsService','openidFactory','userFactory','$timeout', function($scope,$rootScope,$stateParams,$state,wxconfigerFactory,ENV,utilsService,openidFactory,userFactory,$timeout){
         var code = $stateParams.code;
-        //var code = "o7aBGs2evt8W644-18cO1fcrQImI";
-        if(undefined!=code&&(typeof $rootScope.user == 'undefined')){
-            weixinFactory.getUserByCode(code);
-        }
-        $scope.$on('userUpdatedByCode',function(){
-            $rootScope.user = weixinFactory.getUser();
-            utilsService.saveLocalInfo($rootScope.user);
-            if(typeof $rootScope.user == 'undefined'){
-                $state.go("guoqingauction");
-            }else{
-                wxconfigerFactory.get({url:ENV.webapi},function(resp){
-                    var wxConfiger=resp;
-                    wx.config({
-                        debug: false,
-                        appId: wxConfiger.appId,
-                        timestamp: wxConfiger.timestamp+'',
-                        nonceStr: wxConfiger.nonceStr,
-                        signature: wxConfiger.signature,
-                        jsApiList: ['chooseWXPay','hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','onMenuShareTimeline','chooseImage','previewImage','uploadImage']
-                    },function(err){
-                        alert(err);
-                    });
-                });
-                if(null==$rootScope.user.nickname||null==$rootScope.user.phone||1>$rootScope.user.phone.length){
-                    $rootScope.registered = false;
-                }
-                messageCountFactory.get({userId:$rootScope.user.id,status:"wd"},function(resp){
-                    $scope.messageCount = resp.count;
-                    if($scope.messageCount>0){
-                        $scope.hideMessage = false;
-                    }
-                });
-            }
+        console.log("code>>"+angular.toJson($stateParams));
+        wxconfigerFactory.get({url:ENV.webapi},function(resp){
+            var wxConfiger=resp;
+            wx.config({
+                debug: false,
+                appId: wxConfiger.appId,
+                timestamp: wxConfiger.timestamp+'',
+                nonceStr: wxConfiger.nonceStr,
+                signature: wxConfiger.signature,
+                jsApiList: ['chooseWXPay','hideOptionMenu','showOptionMenu','hideMenuItems','showMenuItems','hideAllNonBaseMenuItem','showAllNonBaseMenuItem','onMenuShareTimeline','chooseImage','previewImage','uploadImage']
+            },function(err){
+                alert(err);
+            });
         });
         wx.ready(function(){
             wx.hideOptionMenu();
         });
-        if($rootScope.user){
-            if(null==$rootScope.user.nickname||null==$rootScope.user.phone||1>$rootScope.user.phone.length){
-                $rootScope.registered = false;
-            }
-            messageCountFactory.get({userId:$rootScope.user.id,status:"wd"},function(resp){
-                $scope.messageCount = resp.count;
-                if($scope.messageCount>0){
-                    $scope.hideMessage = false;
+        console.log("code>>"+code);
+        if(code&&code.length>0){
+            //window.localStorage.clear();
+            openidFactory.get({code:code},function(resp){
+                if(resp&&resp.openid.length>0){
+                    utilsService.saveOpenid(resp.openid);
                 }
             });
         }
-    }])
-    .controller('registerController',['$rootScope','$scope','$state','userFactory','$timeout',function($rootScope,$scope,$state,userFactory,$timeout){
-        wx.hideOptionMenu();
-        $scope.registerTip = false;
-        $scope.user=$rootScope.user;
-        $scope.submiting = false;
-        $scope.tipInfo = "";
         $scope.register = function(){
-            $scope.submiting = true;
-            $scope.tipInfo = "正在提交信息...";
-            userFactory.update({openid:$scope.user.openid},$scope.user,function(resp){
-                $rootScope.registered = true;
-                $rootScope.user = resp;
-                $scope.registerTip = true;
-                //$scope.tipInfo = "恭喜,注册成功,请返回首页查看\"关于艺拍堂\"";
-                //$state.go("introduction");
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("你还未关注国青艺拍堂,请先关注国青艺拍堂");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+            }else{
+                $state.go("register");
+            }
+        }
+    }])
+    .controller('registerController',['$rootScope','$scope','$state','userFactory','$timeout','utilsService',function($rootScope,$scope,$state,userFactory,$timeout,utilsService){
+        wx.hideOptionMenu();
+        $rootScope.registerTip = false;
+        $scope.user = {
+            "nickname":"",
+            "phone":"",
+            "shopInfo":""
+        };
+        var localUser = utilsService.getLocalInfo();
+        var openidInfo = utilsService.getOpenid();
+        if(localUser.result == "pass"){
+            $scope.user.nickname = localUser.user.nickname;
+            $scope.user.phone = localUser.user.phone;
+            $scope.user.shopInfo = localUser.user.shopInfo;
+        }
+        $scope.register = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("你还未关注国青艺拍堂,请先关注...");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            utilsService.showLoading("正在提交信息,请稍后...");
+            userFactory.update({openid:openidInfo.openid},$scope.user,function(resp){
+                if(resp && resp.id>1){
+                    utilsService.saveOpenid(resp.openid);
+                }
+                utilsService.hideLoading();
+                $rootScope.registerTip = true;
             },function(err){
-                $scope.tipInfo = "注册失败,请稍后重试";
-                $rootScope.registered = false;
+                utilsService.showLoading("注册失败,请重试");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
             });
         }
     }])
     .controller('artifactsController',['$rootScope','$scope','artifactFactory','$ionicScrollDelegate','utilsService',function($rootScope,$scope,artifactFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        var localUser = utilsService.getLocalInfo();
-        //alert(angular.toJson(localUser));
         $scope.loadingMore = false;
         $rootScope.tabs = [true,false,false,false,false,false];
         $scope.isLoading = true;
@@ -91,7 +90,6 @@ appControllers
             angular.forEach($scope.tabs,function(value,index){
                 if(index==current){
                     $rootScope.tabs[index] = true;
-                    console.log("set tab");
                     artifactFactory.setArtifactType(index);
                 }else{
                     $rootScope.tabs[index] = false;
@@ -128,15 +126,23 @@ appControllers
             return artifactFactory.hasNextPage();
         };
     }])
-    .controller('artifactDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$filter','biddingFactory','randomFactory','ENV','wxconfigerFactory','attentionFactory','storeFactory','$interval','commonFactory',function($rootScope,$scope,$stateParams,artDetailFactory,$filter,biddingFactory,randomFactory,ENV,wxconfigerFactory,attentionFactory,storeFactory,$interval,commonFactory){
+    .controller('artifactDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$filter','biddingFactory','randomFactory','ENV','wxconfigerFactory','attentionFactory','storeFactory','$interval','commonFactory','utilsService','$timeout','openidFactory',function($rootScope,$scope,$stateParams,artDetailFactory,$filter,biddingFactory,randomFactory,ENV,wxconfigerFactory,attentionFactory,storeFactory,$interval,commonFactory,utilsService,$timeout,openidFactory){
         wx.hideOptionMenu();
         wx.showMenuItems({
             menuList: ['menuItem:share:timeline']
         });
-        $scope.registered = $rootScope.registered;
-        var user = $rootScope.user;
         var artId = $stateParams.id;
-        var userId = user.id;
+        var code = $stateParams.code;
+        console.log("artifact detail code>>"+code);
+        if(code&&code.length>0){
+            //window.localStorage.clear();
+            openidFactory.get({code:code},function(resp){
+                console.log("artifact resp>>"+angular.toJson(resp));
+                if(resp&&resp.openid.length>0){
+                    utilsService.saveOpenid(resp.openid);
+                }
+            });
+        }
         $scope.rest=0;
         $scope.showAttentions = [];
         $scope.showloading=true;
@@ -181,10 +187,16 @@ appControllers
             angular.forEach($scope.artifact.images,function(value,index){
                 $scope.usrls.push(value.src);
             });
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
             //分享功能
+            var shareLink = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx40514ce44607c7c7&redirect_uri=http%3a%2f%2fguoqing999.com%2fguoqingauction%2findex.html%23%2ftabs%2fartifact%2f"+$scope.artifact.id+"&response_type=code&scope=snsapi_userinfo&state=yjq#wechat_redirect";
             wx.onMenuShareTimeline({
-                title: '国青艺拍堂宝贝--'+$scope.artifact.name,
-                link: ENV.webapi+"#/share/"+$scope.artifact.id,
+                title: "国青艺拍堂宝贝--"+$scope.artifact.name,
+                link: shareLink,
                 imgUrl: $scope.artifact.images[0].src, // 分享图标
                 success: function () {
                     if(1>$scope.artifact.shared){
@@ -217,6 +229,25 @@ appControllers
         });
         /*出价*/
         $scope.submitBiddingPrice = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能出价");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            if(!utilsService.registered()){
+                utilsService.showLoading("未提交个人信息,不能出价");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            var localInfro = utilsService.getLocalInfo();
+            var user = null;
+            if(localInfro.result = "pass"){
+                user = localInfro.user;
+            }
             $scope.priceError="";
             if($scope.closed){
                 return;
@@ -300,6 +331,13 @@ appControllers
         };
         $scope.commenting = false;
         $scope.submitComment = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能评论");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
             if(1>$scope.vComment.length){
                 return;
             }
@@ -311,6 +349,11 @@ appControllers
                 "share": "0",
                 "user": null
             };
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
             attentionFactory.saveAttention({artifactId:artId,userId:userId},attention,function(resp){
                 $scope.artifact.attentions = resp;
                 $scope.showAttentions = resp;
@@ -323,6 +366,13 @@ appControllers
         };
         $scope.supporting = false;
         $scope.support = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能点赞");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
             $scope.supporting = true;
             if($scope.artifact.supported<1){
                 attention = {
@@ -332,6 +382,11 @@ appControllers
                     "share": "0",
                     "user": null
                 };
+                var localInfro = utilsService.getLocalInfo();
+                var userId = null;
+                if(localInfro.result = "pass"){
+                    userId = localInfro.user.id;
+                }
                 attentionFactory.saveAttention({artifactId:artId,userId:userId},attention,function(resp){
                     $scope.artifact.supported += 1;
                     $scope.supporting = false;
@@ -345,6 +400,18 @@ appControllers
         $scope.storing = false;
         $scope.storeTip = "收藏";
         $scope.store = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能收藏");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
             $scope.storing = true;
             var storeNow = new Date();
             var store = {
@@ -377,9 +444,10 @@ appControllers
             });
         };
     }])
-    .controller("deployController",['$rootScope','$scope','$filter','ENV','wxconfigerFactory','saveOrUpdateFactory','$state','$timeout','$ionicLoading',function($rootScope,$scope,$filter,ENV,wxconfigerFactory,saveOrUpdateFactory,$state,$timeout,$ionicLoading){
+    .controller("deployController",['$rootScope','$scope','saveOrUpdateFactory','$state','$timeout','utilsService',function($rootScope,$scope,saveOrUpdateFactory,$state,$timeout,utilsService){
         wx.hideOptionMenu();
         $scope.canShowDeploy = false;
+        var openidInfo = utilsService.getOpenid();
         $scope.tipInfo = "";
         $scope.images = {
             localIds:[],
@@ -394,18 +462,29 @@ appControllers
             {"typeKey":4,"typeValue":"精雕细琢"},
             {"typeKey":5,"typeValue":"文玩杂项"}
         ];
+        /*拍卖时间*/
+        var now = new Date();
+        var today = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+        var tomorrow = new Date(now.getFullYear(),now.getMonth(),now.getDate()+2);
+        $scope.auctionTime = [
+            {"key":0,"name":"今天","deadline":today.getTime()},
+            {"key":1,"name":"今天和明天","deadline":tomorrow.getTime()}
+        ];
+        $scope.deadline = 1;
         $scope.pointed = false;
         $scope.uploaded = "未上传";
         $scope.submiting = false;
-        $scope.user = $rootScope.user;
-        var now = new Date();
+        var localInfro = utilsService.getLocalInfo();
+        if(localInfro.result = "pass"){
+            $scope.user = localInfro.user;
+        }
         var at = new Date(now.getFullYear(),now.getMonth(),now.getDate()+2);
         $scope.artifact = {
             "id": null,
-            "openId": $scope.user.openid,
+            "openId": openidInfo.openid,
             "name": null,
             "introduction": null,
-            "deadline": at.getTime(),
+            "deadline": tomorrow.getTime(),
             "type": 0,
             "startPrice": 0,
             "increase": 0,
@@ -414,7 +493,7 @@ appControllers
             "baoyou": "1",
             "images": [],
             "submitTime": now.getTime(),
-            "user": $scope.user,
+            "user": null,
             "biddings": [],
             "successPrice": 0,
             "pointed": "0",
@@ -423,16 +502,12 @@ appControllers
             "attentions": [],
             "shareNum": 0
         };
-        if($scope.user.sellerLevel.id==8||($scope.user.canDeployNumber>0&&$scope.user.sellerLevel.id>3&&$scope.user.sellerLevel.id<8)){
+        if(utilsService.canDeploy()){
             $scope.canShowDeploy = true;
         }
-        $scope.showLoading = function() {
-            $ionicLoading.show({
-                template: '正在发布宝贝,请稍后...'
-            });
-        };
-        $scope.hideLoading = function(){
-            $ionicLoading.hide();
+        //修改竞拍时间
+        $scope.changeDeadline = function(){
+            $scope.artifact.deadline = $scope.auctionTime[$scope.deadline].deadline;
         };
         $scope.deleteImg = function(localId){
             angular.forEach($scope.images.localIds,function(value,index){
@@ -513,11 +588,28 @@ appControllers
             return true;
         };
         $scope.deploy = function(){
-            if(!$scope.checkData()){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("你还未关注国青艺拍堂,请先关注");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
                 return;
             }
-            $scope.submiting = true;
-            $scope.showLoading();
+            if(!utilsService.registered()){
+                utilsService.showLoading("未提交个人信息,不能出价");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            if(!$scope.checkData()){
+                utilsService.showLoading($scope.tipInfo);
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            utilsService.showLoading("正在提交宝贝信息,请稍后...");
             if($scope.pointed==true){
                 $scope.artifact.pointed="1";
             }else{
@@ -529,24 +621,22 @@ appControllers
                     $scope.artifact.images.push(image);
                 });
             }
-            $scope.tipInfo = "正在发布宝贝,请稍后...";
             saveOrUpdateFactory.save($scope.artifact,function(resp){
-                if(null!=resp && undefined!=resp){
-                    $rootScope.user.canDeployNumber -=1;
-                    $scope.hideLoading();
-                    if(resp.pointed=='1'){
-                        $state.go("tabs.points");
-                    }else{
-                        $state.go("tabs.artifacts");
-                    }
-                    //$scope.tipInfo = "恭喜,宝贝发布成功,请返回首页";
+                if(resp){
+                    utilsService.reduceDeployNum();
+                    utilsService.hideLoading();
+                    $state.go("tabs.artifacts");
                 }else{
-                    $scope.tipInfo = "抱歉,宝贝发布异常,请稍后再试";
-                    $scope.hideLoading();
+                    utilsService.showLoading("提交宝贝信息失败,请稍后再试...");
+                    $timeout(function(){
+                        utilsService.hideLoading();
+                    },2000);
                 }
             },function(err){
-                $scope.tipInfo = "抱歉,宝贝发布失败,请稍后再试";
-                $scope.hideLoading();
+                utilsService.showLoading("提交宝贝信息失败,请稍后再试...");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
             });
         };
     }])
@@ -584,65 +674,21 @@ appControllers
             return pointFactory.hasNextPage();
         };
     }])
-    /*随机产生artifact
-     .controller('pointController',['$scope','$interval','pointFactory',function($scope,$interval,pointFactory){
-     $scope.assertive = false;
-     $scope.dark = true;
-     pointFactory.getTopArtifacts();
-     $scope.$on('pointUpdated', function() {
-     $scope.artifact=pointFactory.getRandomArtifact();
-     $scope.assertive = false;
-     $scope.dark = true;
-     });
-     //手机摇一摇
-     var SHAKE_THRESHOLD = 3000;
-     var last_update = 0;
-     var x = y = z = last_x = last_y = last_z = 0;
-     //摇一摇开关，1表示开，0表示关
-     var canShake = 1;
-     if (window.DeviceMotionEvent) {
-     window.addEventListener('devicemotion', deviceMotionHandler, false);
-     } else {
-     alert('你的设备不支持DeviceMotion事件');
-     }
-     function deviceMotionHandler(eventData) {
-     var acceleration = eventData.accelerationIncludingGravity;
-     var curTime = new Date().getTime();
-
-     //100ms监听一次，拒绝重复监听
-     if ((curTime - last_update) > 100 && canShake==1) {
-     var diffTime = curTime - last_update;
-     last_update = curTime;
-     x = acceleration.x;
-     y = acceleration.y;
-     z = acceleration.z;
-     var speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
-     if (speed > SHAKE_THRESHOLD) {
-     $scope.assertive = true;
-     $scope.dark = false;
-     pointFactory.getNextArtifacts();
-     }
-     last_x = x;
-     last_y = y;
-     last_z = z;
-     }
-     }
-     $scope.changeArtifact = function(){
-     $scope.assertive = true;
-     $scope.dark = false;
-     pointFactory.getNextArtifacts();
-     }
-     }])
-     */
-    .controller('pointDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$filter','biddingFactory','randomFactory','ENV','wxconfigerFactory','attentionFactory','storeFactory','$interval','commonFactory',function($rootScope,$scope,$stateParams,artDetailFactory,$filter,biddingFactory,randomFactory,ENV,wxconfigerFactory,attentionFactory,storeFactory,$interval,commonFactory){
+    .controller('pointDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$filter','biddingFactory','randomFactory','ENV','wxconfigerFactory','attentionFactory','storeFactory','$interval','commonFactory','utilsService','openidFactory',function($rootScope,$scope,$stateParams,artDetailFactory,$filter,biddingFactory,randomFactory,ENV,wxconfigerFactory,attentionFactory,storeFactory,$interval,commonFactory,utilsService,openidFactory){
         wx.hideOptionMenu();
         wx.showMenuItems({
             menuList: ['menuItem:share:timeline']
         });
-        $scope.registered = $rootScope.registered;
-        var user = $rootScope.user;
         var artId = $stateParams.id;
-        var userId = user.id;
+        var code = $stateParams.code;
+        if(code&&code.length>0){
+            //window.localStorage.clear();
+            openidFactory.get({code:code},function(resp){
+                if(resp&&resp.openid.length>0){
+                    utilsService.saveOpenid(resp.openid);
+                }
+            });
+        }
         $scope.rest=0;
         $scope.showAttentions = [];
         $scope.showloading=true;
@@ -687,10 +733,17 @@ appControllers
             angular.forEach($scope.artifact.images,function(value,index){
                 $scope.usrls.push(value.src);
             });
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
+            var shareLink = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx40514ce44607c7c7&redirect_uri=http%3a%2f%2fguoqing999.com%2fguoqingauction%2findex.html%23%2ftabs%2fpoint%2f"+$scope.artifact.id+"&response_type=code&scope=snsapi_userinfo&state=yjq#wechat_redirect";
+            console.log("shareLink>>"+shareLink);
             //分享功能
             wx.onMenuShareTimeline({
                 title: '国青艺拍堂宝贝--'+$scope.artifact.name,
-                link: ENV.webapi+"#/share/"+$scope.artifact.id,
+                link: shareLink,
                 imgUrl: $scope.artifact.images[0].src, // 分享图标
                 success: function () {
                     if(1>$scope.artifact.shared){
@@ -723,6 +776,25 @@ appControllers
         });
         /*出价*/
         $scope.submitBiddingPrice = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能出价");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            if(!utilsService.registered()){
+                utilsService.showLoading("未提交个人信息,不能出价");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            var localInfro = utilsService.getLocalInfo();
+            var user = null;
+            if(localInfro.result = "pass"){
+                user = localInfro.user;
+            }
             $scope.priceError="";
             if($scope.closed){
                 return;
@@ -806,6 +878,13 @@ appControllers
         };
         $scope.commenting = false;
         $scope.submitComment = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能评论");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
             if(1>$scope.vComment.length){
                 return;
             }
@@ -817,6 +896,11 @@ appControllers
                 "share": "0",
                 "user": null
             };
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
             attentionFactory.saveAttention({artifactId:artId,userId:userId},attention,function(resp){
                 $scope.artifact.attentions = resp;
                 $scope.showAttentions = resp;
@@ -829,6 +913,13 @@ appControllers
         };
         $scope.supporting = false;
         $scope.support = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能点赞");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
             $scope.supporting = true;
             if($scope.artifact.supported<1){
                 attention = {
@@ -838,6 +929,11 @@ appControllers
                     "share": "0",
                     "user": null
                 };
+                var localInfro = utilsService.getLocalInfo();
+                var userId = null;
+                if(localInfro.result = "pass"){
+                    userId = localInfro.user.id;
+                }
                 attentionFactory.saveAttention({artifactId:artId,userId:userId},attention,function(resp){
                     $scope.artifact.supported += 1;
                     $scope.supporting = false;
@@ -851,6 +947,18 @@ appControllers
         $scope.storing = false;
         $scope.storeTip = "收藏";
         $scope.store = function(){
+            if(!utilsService.subscribed()){
+                utilsService.showLoading("未关注国青艺拍堂公众号,不能收藏");
+                $timeout(function(){
+                    utilsService.hideLoading();
+                },2000);
+                return;
+            }
+            var localInfro = utilsService.getLocalInfo();
+            var userId = null;
+            if(localInfro.result = "pass"){
+                userId = localInfro.user.id;
+            }
             $scope.storing = true;
             var storeNow = new Date();
             var store = {
@@ -883,22 +991,32 @@ appControllers
             });
         };
     }])
-    .controller('spokesmanController',['$rootScope','$scope', function($rootScope,$scope){
+    .controller('spokesmanController',['$rootScope','$scope' ,'utilsService', function($rootScope,$scope,utilsService){
         wx.hideOptionMenu();
-        if(typeof $rootScope.user != 'undefined'){
-            $scope.qrcode = $rootScope.user.qrcode;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result == 'pass'){
+            $scope.qrcode = localInfo.user.qrcode;
         }
     }])
-    .controller('meController',['$rootScope','$scope', 'messageCountFactory', function($rootScope,$scope,messageCountFactory){
+    .controller('meController',['$rootScope','$scope', 'messageCountFactory', 'utilsService', function($rootScope,$scope,messageCountFactory, utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
-        messageCountFactory.get({userId:$scope.user.id,status:"wd"},function(resp){
-            $scope.messageCount = resp.count;
-        });
+        if(utilsService.subscribed()){
+            $scope.isShow = true;
+            var localInfo = utilsService.getLocalInfo();
+            $scope.user = localInfo.user;
+            messageCountFactory.get({userId:$scope.user.id,status:"wd"},function(resp){
+                $scope.messageCount = resp.count;
+            });
+        }else{
+            $scope.isShow = false;
+        }
     }])
-    .controller('myartifactController',['$rootScope','$scope','$interval','myartifactFactory','$ionicScrollDelegate',function($rootScope,$scope,$interval,myartifactFactory,$ionicScrollDelegate){
+    .controller('myartifactController',['$rootScope','$scope','$interval','myartifactFactory','$ionicScrollDelegate', 'utilsService',function($rootScope,$scope,$interval,myartifactFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         //获取服务器数据
@@ -935,10 +1053,13 @@ appControllers
             return myartifactFactory.hasNextPage();
         };
     }])
-    .controller('myartifactDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$state','myartifactFactory',function($rootScope,$scope,$stateParams,artDetailFactory,$state,myartifactFactory){
+    .controller('myartifactDetailController',['$rootScope','$scope','$stateParams','artDetailFactory','$state','myartifactFactory', 'utilsService',function($rootScope,$scope,$stateParams,artDetailFactory,$state,myartifactFactory,utilsService){
         wx.hideOptionMenu();
         var id = $stateParams.id;
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         /*分类信息*/
         $scope.types = ["文房四宝","玉粹珠宝","茶酒滋补","紫砂陶器","精雕细琢","文玩杂项"];
         $scope.isLoading=true;
@@ -959,9 +1080,12 @@ appControllers
             });
         }
     }])
-    .controller('payOrdersController',['$rootScope','$scope','$interval','orderFactory',function($rootScope,$scope,$interval,orderFactory){
+    .controller('payOrdersController',['$rootScope','$scope','$interval','orderFactory','utilsService',function($rootScope,$scope,$interval,orderFactory,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         orderFactory.getTopOrders("1");
@@ -994,9 +1118,12 @@ appControllers
             return orderFactory.hasNextPage();
         };
     }])
-    .controller('payOrderDetailController',['$rootScope','$scope','$stateParams','$state','orderFactory','weixinpayFactory','wxconfigerFactory','ENV','addressFactory',function($rootScope,$scope,$stateParams,$state,orderFactory,weixinpayFactory,wxconfigerFactory,ENV,addressFactory){
+    .controller('payOrderDetailController',['$rootScope','$scope','$stateParams','$state','orderFactory','weixinpayFactory','wxconfigerFactory','ENV','addressFactory','utilsService',function($rootScope,$scope,$stateParams,$state,orderFactory,weixinpayFactory,wxconfigerFactory,ENV,addressFactory,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         var id = $stateParams.id;
         /*分类信息*/
         $scope.types = ["文房四宝","玉粹珠宝","茶酒滋补","紫砂陶器","精雕细琢","文玩杂项"];
@@ -1122,9 +1249,12 @@ appControllers
             $scope.tipInfo="设置地址失败";
         });
     }])
-    .controller('fahuoOrdersController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate){
+    .controller('fahuoOrdersController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate','utilsService',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         //获取服务器数据
@@ -1201,9 +1331,12 @@ appControllers
             $scope.tipInfo = "发货失败,请稍后更新发货信息";
         });
     }])
-    .controller('shouhuoOrdersController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate){
+    .controller('shouhuoOrdersController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate','utilsService',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         orderFactory.getTopOrders("3");
@@ -1323,9 +1456,12 @@ appControllers
         };
 
     }])
-    .controller('evaluationController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate){
+    .controller('evaluationController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate','utilsService',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         orderFactory.getTopOrders("4");
@@ -1400,9 +1536,12 @@ appControllers
         };
 
     }])
-    .controller('addressController',['$rootScope','$scope','addressFactory','$state','$ionicScrollDelegate',function($rootScope,$scope,addressFactory,$state,$ionicScrollDelegate){
+    .controller('addressController',['$rootScope','$scope','addressFactory','$state','$ionicScrollDelegate','utilsService',function($rootScope,$scope,addressFactory,$state,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         addressFactory.getTopAddresses();
         $scope.$on('addressesUpdated', function() {
@@ -1451,9 +1590,12 @@ appControllers
             $scope.address=addressFactory.getAddress();
         });
     }])
-    .controller('addressNewController',['$rootScope','$scope','addressFactory','$state',function($rootScope,$scope,addressFactory,$state){
+    .controller('addressNewController',['$rootScope','$scope','addressFactory','$state','utilsService',function($rootScope,$scope,addressFactory,$state,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.submiting = false;
         $scope.address = {
             "username":null,
@@ -1540,9 +1682,12 @@ appControllers
             return true;
         }
     }])
-    .controller('walletController',['$rootScope','$scope','moneyFactory','$state',function($rootScope,$scope,moneyFactory,$state){
+    .controller('walletController',['$rootScope','$scope','moneyFactory','$state','utilsService',function($rootScope,$scope,moneyFactory,$state,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.hasMoney = false;
         moneyFactory.accessMoneys();
         $scope.$on('moneyQuerySuccess',function(){
@@ -1557,9 +1702,12 @@ appControllers
             moneyFactory.accessMoneys();
         }
     }])
-    .controller('transfersController',['$rootScope','$scope','transfersFactory',function($rootScope,$scope,transfersFactory){
+    .controller('transfersController',['$rootScope','$scope','transfersFactory','utilsService',function($rootScope,$scope,transfersFactory,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result=='pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.submiting = false;
         $scope.tipInfo = "";
         $scope.transferMoney = $scope.user.money;
@@ -1588,9 +1736,13 @@ appControllers
             });
         }
     }])
-    .controller('shareArtfactController',['$rootScope','$scope','$stateParams','shareFactory',function($rootScope,$scope,$stateParams,shareFactory){
+    .controller('shareArtfactController',['$rootScope','$scope','$stateParams','shareFactory','utilsService',function($rootScope,$scope,$stateParams,shareFactory,utilsService){
         wx.hideOptionMenu();
-        var user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        var user = null;
+        if(localInfo.result=='pass'){
+            user = localInfo.user;
+        }
         var artId = $stateParams.id;
         $scope.nodata = false;
         $scope.showloading=true;
@@ -1604,11 +1756,16 @@ appControllers
             $scope.nodata = true;
         });
     }])
-    .controller('myStoreController',['$rootScope','$scope','storeFactory','ENV',function($rootScope,$scope,storeFactory,ENV){
+    .controller('myStoreController',['$rootScope','$scope','storeFactory','ENV','utilsService',function($rootScope,$scope,storeFactory,ENV,utilsService){
         wx.hideOptionMenu();
         $scope.weburl = ENV.webapi;
-        var user = $rootScope.user;
-        var userId = user.id;
+        var localInfo = utilsService.getLocalInfo();
+        var user = null;
+        var userId = null;
+        if(localInfo.result=='pass'){
+            user = localInfo.user;
+            userId = user.id;
+        }
         $scope.tipInfo = "";
         $scope.stores = [];
         $scope.showloading=true;
@@ -1619,11 +1776,16 @@ appControllers
             $scope.tipInfo = "加载数据失败,请稍后重试...";
         });
     }])
-    .controller('myMessageController',['$rootScope','$scope','messageFactory','ENV',function($rootScope,$scope,messageFactory,ENV){
+    .controller('myMessageController',['$rootScope','$scope','messageFactory','ENV','utilsService',function($rootScope,$scope,messageFactory,ENV,utilsService){
         wx.hideOptionMenu();
         $scope.weburl = ENV.webapi;
-        var user = $rootScope.user;
-        var userId = user.id;
+        var localInfo = utilsService.getLocalInfo();
+        var user = null;
+        var userId = null;
+        if(localInfo.result=='pass'){
+            user = localInfo.user;
+            userId = user.id;
+        }
         $scope.tipInfo = "";
         $scope.messages = [];
         $scope.isloading=true;
@@ -1830,9 +1992,12 @@ appControllers
             return shopsFactory.hasNextPage();
         };
     }])
-    .controller('forumsController',['$rootScope','$scope','forumFactory','$ionicScrollDelegate','forumCommentFactory','$ionicPopup',function($rootScope,$scope,forumFactory,$ionicScrollDelegate,forumCommentFactory,$ionicPopup){
+    .controller('forumsController',['$rootScope','$scope','forumFactory','$ionicScrollDelegate','forumCommentFactory','$ionicPopup','utilsService',function($rootScope,$scope,forumFactory,$ionicScrollDelegate,forumCommentFactory,$ionicPopup,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result == 'pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         $scope.loadingMore = false;
         $scope.supporting = false;
@@ -1923,7 +2088,10 @@ appControllers
         $scope.isLoading = true;
         $scope.commenting = false;
         $scope.inputComment = "";
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result == 'pass'){
+            $scope.user = localInfo.user;
+        }
         var forumId = $stateParams.id;
         var resource = forumFactory.getResource();
         resource.get({id:forumId},function(resp){
@@ -1961,9 +2129,12 @@ appControllers
             $ionicScrollDelegate.$getByHandle('mainScroll').scrollBottom(false);
         }
     }])
-    .controller('forumDeployController',['$rootScope','$scope','wxconfigerFactory','ENV','forumFactory','$state','$ionicLoading',function($rootScope,$scope,wxconfigerFactory,ENV,forumFactory,$state,$ionicLoading){
+    .controller('forumDeployController',['$rootScope','$scope','wxconfigerFactory','ENV','forumFactory','$state','$ionicLoading','utilsService',function($rootScope,$scope,wxconfigerFactory,ENV,forumFactory,$state,$ionicLoading,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result == 'pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.tipInfo = "";
         $scope.images = {
             localIds:[],
@@ -2088,9 +2259,12 @@ appControllers
 
         };
     }])
-    .controller('shenpiController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate){
+    .controller('shenpiController',['$rootScope','$scope','$interval','orderFactory','$ionicScrollDelegate','utilsService',function($rootScope,$scope,$interval,orderFactory,$ionicScrollDelegate,utilsService){
         wx.hideOptionMenu();
-        $scope.user = $rootScope.user;
+        var localInfo = utilsService.getLocalInfo();
+        if(localInfo.result == 'pass'){
+            $scope.user = localInfo.user;
+        }
         $scope.isLoading = true;
         orderFactory.getTopOrders("6");
         $scope.$on('ordersUpdated', function() {
@@ -2154,14 +2328,12 @@ appControllers
                 $scope.order.artifact.status = "4";
                 $scope.order.artifact.returnResult = "disagree";
             }
-            resource.update({userId:$scope.user.id,id:id}, $scope.order,
+            resource.update({id:id}, $scope.order,
                 function(res){
                     if('4'==res.artifact.status){
-                        $rootScope.user = res.user;
                         $scope.tipInfo = "不同意退货,已经付款给卖家";
                     }
                     if('9'==res.artifact.status){
-                        $rootScope.user = res.user;
                         if(res.type=='0'){
                             $scope.tipInfo = "同意退货,请及时到微信平台完成退款,商户订单号为:"+res.wxOrderId;
                         }else{
@@ -2169,7 +2341,6 @@ appControllers
                         }
                     }
                     if('6'==res.artifact.status){
-                        $rootScope.user = res.user;
                         $scope.tipInfo = "操作失败,请稍后再试";
                     }
                 },

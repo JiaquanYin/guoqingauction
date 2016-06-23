@@ -1,6 +1,6 @@
 <ion-view view-title="我的艺拍堂" ng-controller="meController">
     <ion-content>
-        <div class="page">
+        <div class="page" ng-if="isShow">
             <div class="weui_msg" style="padding-top: 12px">
                 <div class="weui_icon_area" style="margin-bottom: 10px">
                     <img class="page_top_icon" ng-src="{{user.headimgurl}}" style="border-radius:50%;">
@@ -114,5 +114,6 @@
                 </div>
             </div>
         </div>
+        <p style="text-align: center;padding: 10px 10px;" ng-if="isShow==false">对不起,你还未关注国青艺拍堂公众号,无法使用相关功能</p>
     </ion-content>
 </ion-view>

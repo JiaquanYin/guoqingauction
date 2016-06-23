@@ -26,7 +26,7 @@ appServices.factory('weixinFactory',function($rootScope,$resource,ENV){
 });
 appServices.factory('userFactory',function($rootScope,$resource,ENV){
     var rootApi = ENV.api;
-    var url = rootApi+"users/:openid";
+    var url = rootApi+"users/openid/:openid";
     return resource = $resource(url,{openid:"@openid"},{
         update: {
             method: 'PUT',
@@ -39,7 +39,7 @@ appServices.factory('transfersFactory',function($rootScope,$resource,ENV){
     var url = rootApi+":userId/transfers/:money";
     return resource = $resource(url,{userId:"@userId",money:"@money"});
 });
-appServices.factory('moneyFactory',function($rootScope,$resource,ENV){
+appServices.factory('moneyFactory',function($rootScope,$resource,ENV,utilsService){
     var rootApi = ENV.api;
     var url = rootApi+":userId/moneys";
     var moneys = {};
@@ -50,10 +50,15 @@ appServices.factory('moneyFactory',function($rootScope,$resource,ENV){
             isArray:true
         }
     });
+    var localInfo = utilsService.getLocalInfo();
+    var userId = null;
+    if(localInfo.result=='pass'){
+        userId = localInfo.user.id;
+    }
 
     return {
         accessMoneys: function(){
-            resource.query({userId:$rootScope.user.id},function(res){
+            resource.query({userId:userId},function(res){
                 moneys.data = res;
                 $rootScope.$broadcast('moneyQuerySuccess');
             });
@@ -166,10 +171,15 @@ appServices.factory('artifactFactory',function($rootScope,$resource,ENV){
         }
     }
 });
-appServices.factory('artDetailFactory',function($rootScope,$resource,ENV){
+appServices.factory('artDetailFactory',function($rootScope,$resource,ENV,utilsService){
     var ApiUrl = ENV.api+":userId/artifacts/:id",
     // 用来存储宝贝详细
-        artifact = null,userId = $rootScope.user.id;
+        artifact = null;
+    var localInfo = utilsService.getLocalInfo();
+    var userId = null;
+    if(localInfo.result=='pass'){
+        userId = localInfo.user.id;
+    }
     var resource = $resource(ApiUrl, {userId:'@userId', id:'@id'},{
         update: {method:'PUT'}
     });
@@ -295,27 +305,9 @@ appServices.factory('pointFactory',function($rootScope,$resource,ENV){
         }
     }
 });
-appServices.factory('openidFactory',function($rootScope,$resource,ENV){
-    var rootApi = ENV.api;
-    var url = rootApi+"openid/:openid";
-    var resource = $resource(url,{openid:'@openid'});
-    var user = {};
-    return {
-        getUserByOpenid:function(openid){
-            resource.get({openid:openid},
-                function(resp){
-                    user = resp;
-                    $rootScope.$broadcast("openidUpdated");
-                }
-            );
-        },
-        getUser:function(){
-            if(undefined == user.id){
-                return;
-            }
-            return user;
-        }
-    };
+appServices.factory('openidFactory',function($resource,ENV){
+    var url = ENV.api+"openid";
+    return $resource(url,{code:'@code'});
 });
 appServices.factory('myartifactFactory',function($rootScope,$resource,ENV){
     var ApiUrl = ENV.api+":userId/artifacts",
@@ -497,13 +489,16 @@ appServices.factory('shopsFactory',function($rootScope,$resource,ENV){
         }
     }
 });
-appServices.factory('orderFactory',function($rootScope,$resource,ENV){
+appServices.factory('orderFactory',function($rootScope,$resource,ENV,utilsService){
     var ApiUrl = ENV.api+":userId/orders/:id",
     // 用来存储话题类别的数据结构，包含了下一页、是否有下一页等属性
         orders = {},
-        userId = $rootScope.user.id,
         order = {};
-
+    var localInfo = utilsService.getLocalInfo();
+    var userId = null;
+    if(localInfo.result=='pass'){
+        userId = localInfo.user.id;
+    }
 
     var resource = $resource(ApiUrl, {userId:'@userId',id:"@id"}, {
         query: {
@@ -650,14 +645,17 @@ appServices.factory('weixinpayFactory',function($rootScope,$resource,ENV){
         }
     }
 });
-appServices.factory('addressFactory',function($rootScope,$resource,ENV){
+appServices.factory('addressFactory',function($rootScope,$resource,ENV,utilsService){
 
     var ApiUrl = ENV.api+":userId/addresses/:id",
     // 用来存储话题类别的数据结构，包含了下一页、是否有下一页等属性
         addresses = {},
-        userId = $rootScope.user.id,
         address = {};
-
+    var localInfo = utilsService.getLocalInfo();
+    var userId = null;
+    if(localInfo.result=='pass'){
+        userId = localInfo.user.id;
+    }
 
     var resource = $resource(ApiUrl, {userId:'@userId',id:"@id"}, {
         query: {
@@ -896,9 +894,13 @@ appServices.factory('noneSubordinateInvestorsFactory',function($rootScope,$resou
     });
     return resource;
 });
-appServices.factory('forumFactory',function($rootScope,$resource,ENV){
+appServices.factory('forumFactory',function($rootScope,$resource,ENV,utilsService){
     var ApiUrl = ENV.api+":userId/forums/:id", forums = {};
-    var userId = $rootScope.user.id;
+    var localInfo = utilsService.getLocalInfo();
+    var userId = null;
+    if(localInfo.result=='pass'){
+        userId = localInfo.user.id;
+    }
     //var userId = 1;
     var resource = $resource(ApiUrl, {userId:"@userId",id:'@id'}, {
         query: {

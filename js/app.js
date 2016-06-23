@@ -3,25 +3,25 @@
  */
 angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myControllers','myServices','filterModule','UtilsModule'])
     .config(function($stateProvider, $httpProvider, $urlRouterProvider,$ionicConfigProvider) {
-        $httpProvider.interceptors.push(function($rootScope){
-            return {
-                request: function(config) {
-                    var openid = "login";
-                    if(undefined!=$rootScope.user){
-                        openid = $rootScope.user.openid;
-                    }
-                    config.headers['login-openid'] = openid;
-                    return config;
-                },
-                response: function(response) {
-                    var responseFlag = response.headers('responseFlag');
-                    if(responseFlag=="notpass"){
-                        window.location.href = "#/guoqingauction";
-                    }
-                    return response;
-                }
-            };
-        });
+        //$httpProvider.interceptors.push(function($rootScope){
+        //    return {
+        //        request: function(config) {
+        //            var openid = "login";
+        //            if(undefined!=$rootScope.user){
+        //                openid = $rootScope.user.openid;
+        //            }
+        //            config.headers['login-openid'] = openid;
+        //            return config;
+        //        },
+        //        response: function(response) {
+        //            var responseFlag = response.headers('responseFlag');
+        //            if(responseFlag=="notpass"){
+        //                window.location.href = "#/guoqingauction";
+        //            }
+        //            return response;
+        //        }
+        //    };
+        //});
         $ionicConfigProvider.platform.ios.tabs.style('standard');
         $ionicConfigProvider.platform.ios.tabs.position('bottom');
         $ionicConfigProvider.platform.android.tabs.style('standard');
@@ -67,7 +67,7 @@ angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myContro
                 }
             })
             .state('tabs.artifact', {
-                url: "/artifact/:id",
+                url: "/artifact/:id?code&state",
                 views: {
                     'tab-look': {
                         templateUrl: "templates/artifact/artifact-detail.html"
@@ -99,7 +99,7 @@ angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myContro
                 }
             })
             .state('tabs.point', {
-                url: "/point/:id",
+                url: "/point/:id?code&state",
                 views: {
                     'tab-look': {
                         templateUrl: "templates/point/point-detail.html"
@@ -227,6 +227,6 @@ angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myContro
                 templateUrl: "templates/share-artifact.html"
             });
 
-        $urlRouterProvider.otherwise("/guoqingauction");
+        $urlRouterProvider.otherwise("/home");
 
     });

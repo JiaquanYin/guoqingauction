@@ -1,8 +1,8 @@
-<ion-view view-title="注册">
-    <ion-content class="weui_tab_bd page-bg" ng-controller="registerController">
+<ion-view view-title="注册" class="register">
+    <ion-content ng-controller="registerController">
         <form name="registerForm" ng-hide="registerTip" style="background: transparent;">
-            <div style="margin-top: 30px;">
-                <h1 class="page_title">注册</h1>
+            <div style="margin-top: 16px;">
+                <h1 class="page_title">我的信息</h1>
             </div>
             <div class="weui_cells_title" style="margin-top: 0">请补充您的信息...</div>
             <div class="weui_cells weui_cells_form" style="background: transparent;">
@@ -42,11 +42,8 @@
             </div>
 
             <div class="weui_cells space-bottom" style="margin-top:0;background: transparent;">
-                <div class="weui_cells_tips" ng-show="0<tipInfo.length">
-                    <p class="padding" style="text-align: center;color: #FF1A0E" ng-bind="tipInfo"></p>
-                </div>
                 <div class="weui_btn_area" style="margin-top:10px;">
-                    <button ng-disabled="registerForm.$invalid||submiting" class="button button-block auction_btn" style="background-color: #e0d3b0;border-radius: 40px;-moz-border-radius: 40px;margin-bottom: 16px;" ng-click="register()">提交信息</button>
+                    <button ng-disabled="registerForm.$invalid||submiting" class="button button-block" ng-click="register()">提交信息</button>
                 </div>
             </div>
 

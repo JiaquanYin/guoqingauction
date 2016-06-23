@@ -1,5 +1,8 @@
 var utilsModule = angular.module("UtilsModule",[]);
-utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading', function($log, $state, $ionicLoading){
+utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource','ENV', function($log, $state, $ionicLoading,$resource,ENV){
+    var rootApi = ENV.api;
+    var url = rootApi+"users/openid/:openid";
+    var resource = $resource(url,{openid:"@openid"});
     return {
         showLoading: function (content) {
             $ionicLoading.show({
@@ -18,14 +21,6 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading', function(
         now: function(){
             var now = new Date();
             return now.getTime();
-        },
-        saveLocalInfo: function(user){
-            var now = new Date();
-            var localInfo = {
-                "time":now.getTime(),
-                "user":user
-            };
-            window.localStorage.setItem("localInfo",angular.toJson(localInfo));
         },
         getLocalInfo: function(){
             var localJson = window.localStorage.getItem("localInfo");
@@ -48,25 +43,81 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading', function(
                 return result;
             }
         },
-        subscribe: function(){
+        saveOpenid: function(openid){
+            window.localStorage.setItem("localInfo","");
+            var now = new Date();
+            var openidInfo = {
+                "time":now.getTime(),
+                "openid":openid
+            };
+            window.localStorage.setItem("openidInfo",angular.toJson(openidInfo));
+            resource.get({openid:openid},function(resp){
+                if(resp && resp.id>1){
+                    var now = new Date();
+                    var localInfo = {
+                        "time":now.getTime(),
+                        "user":resp
+                    };
+                    window.localStorage.setItem("localInfo",angular.toJson(localInfo));
+                }
+            });
+        },
+        getOpenid: function(){
+            var openidJson = window.localStorage.getItem("openidInfo");
+            var result = {
+                "flag":"noopenid",
+                "openid":""
+            };
+            if(openidJson){
+                var now = new Date();
+                var opeidInfo = angular.fromJson(openidJson);
+                if(opeidInfo.time>(now.getTime()-60*60*1000)){
+                    result.flag = "pass";
+                    result.openid = opeidInfo.openid;
+                }else{
+                    result.result = "timeout";
+                }
+            }
+            return result;
+        },
+        subscribed: function(){
             var localJson = window.localStorage.getItem("localInfo");
             if(localJson){
-                return true;
-            }else{
-                return false;
+                var localInfo = angular.fromJson(localJson);
+                if(localInfo.user&&localInfo.user.openid&&localInfo.user.subscribe=='1'){
+                    return true;
+                }
             }
+            return false;
         },
         registered: function(){
             var localJson = window.localStorage.getItem("localInfo");
             if(localJson){
                 var localInfo = angular.fromJson(localJson);
-                if(localInfo.user&&localInfo.user.phone){
+                if(localInfo.user&&localInfo.user.openid&&localInfo.user.subscribe=='1'&&localInfo.user.phone){
                     return true;
-                }else{
-                    return false;
                 }
-            }else{
-                return false;
+            }
+            return false;
+        },
+        canDeploy: function(){
+            var localJson = window.localStorage.getItem("localInfo");
+            if(localJson){
+                var localInfo = angular.fromJson(localJson);
+                if(localInfo.user&&(localInfo.user.sellerLevel.id==8||localInfo.user.canDeployNumber>0)){
+                    return true;
+                }
+            }
+            return false;
+        },
+        reduceDeployNum: function(){
+            var localJson = window.localStorage.getItem("localInfo");
+            if(localJson){
+                var localInfo = angular.fromJson(localJson);
+                if(localInfo.result=='pass'&&localInfo.user.canDeployNumber>0){
+                    localInfo.user.canDeployNumber -= 1;
+                    window.localStorage.setItem("localInfo",angular.toJson(localInfo));
+                }
             }
         }
     };

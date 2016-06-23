@@ -2,7 +2,7 @@ body,html {
     height:100%;
     -webkit-tap-highlight-color:transparent;
 }
-.page-bg {
+.home {
     background: url(http://guoqingauctionbucket.oss-cn-qingdao.aliyuncs.com/guoqingauction/images/bg.jpg) no-repeat center;
 }
 .page,body {
@@ -183,12 +183,6 @@ body,html {
 .page.slideOut {
     -webkit-animation:b .2s forwards;
     animation:b .2s forwards;
-}
-
-/*my style*/
-.my-padding{
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 /*数据校验*/
@@ -505,4 +499,19 @@ body,html {
 }
 .info p span {
     font-weight: bold;
+}
+.home .button {
+    background-color: #e0d3b0;
+    border-radius: 40px;
+    -moz-border-radius: 40px;
+    margin-bottom: 16px;
+}
+.register {
+    background: url(http://guoqingauctionbucket.oss-cn-qingdao.aliyuncs.com/guoqingauction/images/bg.jpg) no-repeat center;
+}
+.register .button {
+    background-color: #e0d3b0;
+    border-radius: 40px;
+    -moz-border-radius: 40px;
+    margin-bottom: 16px;
 }
