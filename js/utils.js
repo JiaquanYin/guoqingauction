@@ -23,7 +23,7 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             return now.getTime();
         },
         getLocalInfo: function(){
-            var localJson = window.localStorage.getItem("localInfo");
+            var localJson = window.sessionStorage.getItem("localInfo");
             var result = {
                 "result": "nouser",
                 "user":null
@@ -44,13 +44,13 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             }
         },
         saveOpenid: function(openid){
-            window.localStorage.setItem("localInfo","");
+            window.sessionStorage.setItem("localInfo","");
             var now = new Date();
             var openidInfo = {
                 "time":now.getTime(),
                 "openid":openid
             };
-            window.localStorage.setItem("openidInfo",angular.toJson(openidInfo));
+            window.sessionStorage.setItem("openidInfo",angular.toJson(openidInfo));
             resource.get({openid:openid},function(resp){
                 if(resp && resp.id>1){
                     var now = new Date();
@@ -58,12 +58,12 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
                         "time":now.getTime(),
                         "user":resp
                     };
-                    window.localStorage.setItem("localInfo",angular.toJson(localInfo));
+                    window.sessionStorage.setItem("localInfo",angular.toJson(localInfo));
                 }
             });
         },
         getOpenid: function(){
-            var openidJson = window.localStorage.getItem("openidInfo");
+            var openidJson = window.sessionStorage.getItem("openidInfo");
             var result = {
                 "flag":"noopenid",
                 "openid":""
@@ -81,7 +81,7 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             return result;
         },
         subscribed: function(){
-            var localJson = window.localStorage.getItem("localInfo");
+            var localJson = window.sessionStorage.getItem("localInfo");
             if(localJson){
                 var localInfo = angular.fromJson(localJson);
                 if(localInfo.user&&localInfo.user.openid&&localInfo.user.subscribe=='1'){
@@ -91,7 +91,7 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             return false;
         },
         registered: function(){
-            var localJson = window.localStorage.getItem("localInfo");
+            var localJson = window.sessionStorage.getItem("localInfo");
             if(localJson){
                 var localInfo = angular.fromJson(localJson);
                 if(localInfo.user&&localInfo.user.openid&&localInfo.user.subscribe=='1'&&localInfo.user.phone){
@@ -101,7 +101,7 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             return false;
         },
         canDeploy: function(){
-            var localJson = window.localStorage.getItem("localInfo");
+            var localJson = window.sessionStorage.getItem("localInfo");
             if(localJson){
                 var localInfo = angular.fromJson(localJson);
                 if(localInfo.user&&(localInfo.user.sellerLevel.id==8||localInfo.user.canDeployNumber>0)){
@@ -111,12 +111,12 @@ utilsModule.factory('utilsService',['$log', '$state', '$ionicLoading','$resource
             return false;
         },
         reduceDeployNum: function(){
-            var localJson = window.localStorage.getItem("localInfo");
+            var localJson = window.sessionStorage.getItem("localInfo");
             if(localJson){
                 var localInfo = angular.fromJson(localJson);
                 if(localInfo.result=='pass'&&localInfo.user.canDeployNumber>0){
                     localInfo.user.canDeployNumber -= 1;
-                    window.localStorage.setItem("localInfo",angular.toJson(localInfo));
+                    window.sessionStorage.setItem("localInfo",angular.toJson(localInfo));
                 }
             }
         }

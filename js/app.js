@@ -2,7 +2,7 @@
  * Created by jiaquan on 16/2/5.
  */
 angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myControllers','myServices','filterModule','UtilsModule'])
-    .config(function($stateProvider, $httpProvider, $urlRouterProvider,$ionicConfigProvider) {
+    .config(function($stateProvider,$locationProvider, $httpProvider, $urlRouterProvider,$ionicConfigProvider) {
         //$httpProvider.interceptors.push(function($rootScope){
         //    return {
         //        request: function(config) {
@@ -35,6 +35,7 @@ angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myContro
 
         $ionicConfigProvider.platform.ios.views.transition('ios');
         $ionicConfigProvider.platform.android.views.transition('android');
+        $locationProvider.html5Mode(true);
         $ionicConfigProvider.views.maxCache(0);
         $stateProvider
             .state('tabs', {
@@ -227,6 +228,6 @@ angular.module('ionicApp', ['ionic','ngResource','ngMessages','config','myContro
                 templateUrl: "templates/share-artifact.html"
             });
 
-        $urlRouterProvider.otherwise("/home");
+        $urlRouterProvider.otherwise("/tabs/home");
 
     });
